@@ -1,32 +1,27 @@
-import serial				# Se importa librería Serial
-
-# Configuración puerto serial
-port = '/dev/serial0'			# Se define puerto
-baudrate = 9600				# Frecuencia/velocidad de trabajo
-
-output_file = 'gps_data.txt'		# Se crea una rchivo donde se guarda la info
+# funcionesGPS.py
+import serial
+import threading
 
 
 class DetenerLectura(Exception):
-	pass
+    pass
 
-def manejarGPS(flagDetener = False):
-	ser = serial.Serial(port, baudrate, timeout=1) # Se abre puerto serial
 
-	if flagDetener is True:
-		raise DetenerLectura
+def manejarGPS(stop_event, port='/dev/serial0', baudrate=9600,
+               output_file='gps_data.txt'):
+    ser = serial.Serial(port, baudrate, timeout=1)  # Open serial port
 
-	try:
-		with open(output_file, 'a') as file:
-			print(f"Guardando datos en {output_file}. Presione CTRL+C para salir.")
-			while True:
-				line = ser.readline().decode('ascii', errors='replace').strip()
-				if line:
-					print(line)
-					file.write(line + '\n')
-	except KeyboardInterrupt:
-		print("\nPrograma interrupido. Cerrando...")
-	except DetenerLectura:
-		pass
-	finally:
-		ser.close()
+    try:
+        with open(output_file, 'a') as file:
+            print(f"Guardando datos en {output_file}." +
+                  "Presione CTRL+C para salir.")
+            while not stop_event.is_set():
+                line = ser.readline().decode('ascii', errors='replace').strip()
+                if line:
+                    print(line)
+                    file.write(line + '\n')
+    except Exception as e:
+        print(f"Error en manejarGPS: {e}")
+    finally:
+        ser.close()
+        print("Puerto serial cerrado.")
