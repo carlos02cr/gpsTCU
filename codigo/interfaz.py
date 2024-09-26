@@ -3,6 +3,8 @@ from tkinter import ttk
 import pexpect
 import serial
 import subprocess
+from funcionesGPS import manejarGPS
+
 
 class VirtualKeyboard(tk.Tk):
     def __init__(self):
@@ -16,28 +18,27 @@ class VirtualKeyboard(tk.Tk):
         self.create_widgets()
 
     def create_widgets(self):
- 
-        #se crea un frame para el inicio de sesión
-        self.login_frame =tk.Frame(self)
+
+        # Se crea un frame para el inicio de sesión
+        self.login_frame = tk.Frame(self)
         self.login_frame.pack(expand=True, fill='both')
-        
+
         tk.Label(self.login_frame, text="USUARIO:").pack(pady=10)
         tk.Entry(self.login_frame, textvariable=self.username).pack(pady=10)
-        
+
         tk.Label(self.login_frame, text="CONTRASEÑA:").pack(pady=10)
         tk.Entry(self.login_frame, textvariable=self.password, show="*").pack(pady=10)
-        #Se crea el teclado y se almacena en self.keyboard_frame
+        # Se crea el teclado y se almacena en self.keyboard_frame
         self.keyboard_frame = tk.Frame(self.login_frame)
         self.keyboard_frame.pack(pady=10)
-        
+
         self.create_keyboard()
-        
+
         tk.Button(self.login_frame, text="INICIAR", command=self.send_data).pack(pady=0.1)
-        
-        #Se crea un frame para la sección de viaje(inicialmente oculto)
+
+        # Se crea un frame para la sección de viaje(inicialmente oculto)
         self.trip_frame = tk.Frame(self)
 
-        
         tk.Button(self.trip_frame, text="Iniciar Viaje", command=self.read_gps).pack(pady=20)
         tk.Button(self.trip_frame, text="Finalizar Viaje", command=self.stop_gps).pack(pady=20)
 
@@ -66,24 +67,31 @@ class VirtualKeyboard(tk.Tk):
         else:
             if self.focus_get():
                 self.focus_get().insert(tk.END, key)
+
     def send_data(self):
         print(f"Usuario: {self.username.get()}")
         print(f"Contraseña: {self.password.get()}")
-        
-        #Se oculta el frame de inicio de sesión y se muestra el de viaje
-        self.login_frame.pack_forget()    #oculta el frame de inicio de sesión
-        self.trip_frame.pack(expand=True, fill='both') #Muestra el frame de viaje
-        
-        #Se oculta el teclado después de iniciar sesión
+
+        # Se oculta el frame de inicio de sesión y se muestra el de viaje
+        self.login_frame.pack_forget()    # Oculta el frame de inicio de sesión
+        # Muestra el frame de viaje
+        self.trip_frame.pack(expand=True, fill='both')
+
+        # Se oculta el teclado después de iniciar sesión
         self.keyboard_frame.pack_forget()
         self.login_frame.update()
+
     def read_gps(self):
-        #se ejecuta el comando minicom
-        self.gps_process = pexpect.spawn('sudo minicom -b 9600 -o -D /dev/serial0')
+        # Se inicia la lectura de datos del GPS
+        # self.gps_process = pexpect.spawn('sudo minicom -b 9600 -o -D /dev/serial0')
+        manejarGPS()
+
     def stop_gps(self):
-        #implementar el comando para finalizar la lectura del GPS
+        # Implementar el comando para finalizar la lectura del GPS
+        manejarGPS(flagDetener=True)
         print("Lectura de GPS finalizada")
+
+
 if __name__ == "__main__":
     start = VirtualKeyboard()
     start.mainloop()
-    
