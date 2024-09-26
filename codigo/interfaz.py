@@ -42,8 +42,10 @@ class VirtualKeyboard(tk.Tk):
         # Create a frame for the trip section (initially hidden)
         self.trip_frame = tk.Frame(self)
 
-        tk.Button(self.trip_frame, text="Iniciar Viaje", command=self.start_gps).pack(pady=20)
-        tk.Button(self.trip_frame, text="Finalizar Viaje", command=self.stop_gps).pack(pady=20)
+        tk.Button(self.trip_frame, text="Iniciar Viaje",
+                  command=self.start_gps, width=20, height=3).pack(pady=50)
+        tk.Button(self.trip_frame, text="Finalizar Viaje",
+                  command=self.stop_gps, width=20, height=3).pack(pady=50)
 
     def create_keyboard(self):
         keys = [
