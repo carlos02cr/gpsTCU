@@ -1,32 +1,24 @@
 import tkinter as tk
 import threading
-import bcrypt
-import db_manager  # Importamos las funciones desde el archivo db_manager.py
+import subprocess
 from funcionesGPS import manejarGPS
 
 class VirtualKeyboard(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("INICIO DE SESION")
-        self.geometry("800x480")  # Adjust to the dimensions of the touchscreen
+        self.geometry("800x480")  # Ajustar a las dimensiones de la pantalla táctil
 
         self.username = tk.StringVar()
         self.password = tk.StringVar()
-        self.nombre = tk.StringVar()
-        self.cedula = tk.StringVar()
-        self.telefono = tk.StringVar()
 
         self.gps_thread = None
         self.stop_event = threading.Event()
 
-        # Conectar a la base de datos y crear tabla si no existe
-        self.conn = db_manager.conectar_db()
-        db_manager.crear_tabla(self.conn)
-
         self.create_widgets()
 
     def create_widgets(self):
-        # Create a frame for login
+        # Crear un marco para el inicio de sesión
         self.login_frame = tk.Frame(self)
         self.login_frame.pack(expand=True, fill='both')
 
@@ -36,48 +28,58 @@ class VirtualKeyboard(tk.Tk):
         tk.Label(self.login_frame, text="CONTRASEÑA:").pack(pady=10)
         tk.Entry(self.login_frame, textvariable=self.password, show="*").pack(pady=10)
 
-        # Create the keyboard and store it in self.keyboard_frame
+        # Crear el teclado y almacenarlo en self.keyboard_frame
         self.keyboard_frame = tk.Frame(self.login_frame)
         self.keyboard_frame.pack(pady=10)
 
         self.create_keyboard()
 
-        tk.Button(self.login_frame, text="INICIAR", command=self.send_data).pack(pady=10)
-        tk.Button(self.login_frame, text="REGISTRAR", command=self.show_registration_frame).pack(pady=10)
+        tk.Button(self.login_frame, text="INICIAR", command=self.send_data).pack(pady=5)
+        tk.Button(self.login_frame, text="REGISTRARSE", command=self.show_registration).pack(pady=5)
 
-        # Create frames for registration and trip sections (initially hidden)
-        self.registration_frame = tk.Frame(self)
+        # Crear un marco para la sección del viaje (inicialmente oculta)
         self.trip_frame = tk.Frame(self)
 
-        self.create_registration_frame()
-
         tk.Button(self.trip_frame, text="Iniciar Viaje",
-                  command=self.start_gps, width=20, height=3).pack(pady=50)
+                  command=self.start_gps, width=20, height=3).pack(pady=20)
         tk.Button(self.trip_frame, text="Finalizar Viaje",
-                  command=self.stop_gps, width=20, height=3).pack(pady=50)
+                  command=self.stop_gps, width=20, height=3).pack(pady=20)
 
-    def create_registration_frame(self):
-        tk.Label(self.registration_frame, text="NOMBRE:").pack(pady=10)
-        tk.Entry(self.registration_frame, textvariable=self.nombre).pack(pady=10)
+        # Label para mostrar mensajes de estado
+        self.status_message = tk.StringVar()
+        tk.Label(self.trip_frame, textvariable=self.status_message, fg="green").pack(pady=10)
 
-        tk.Label(self.registration_frame, text="CEDULA:").pack(pady=10)
-        tk.Entry(self.registration_frame, textvariable=self.cedula).pack(pady=10)
+        # Crear marco para la sección de registro (inicialmente oculta)
+        self.registration_frame = tk.Frame(self)
 
-        tk.Label(self.registration_frame, text="TELEFONO:").pack(pady=10)
-        tk.Entry(self.registration_frame, textvariable=self.telefono).pack(pady=10)
+        tk.Label(self.registration_frame, text="Registro").pack(pady=10)
+        self.operator_id = tk.StringVar()
+        self.name = tk.StringVar()
+        self.phone = tk.StringVar()
+        self.email = tk.StringVar()
+        self.register_username = tk.StringVar()
+        self.register_password = tk.StringVar()
 
-        tk.Label(self.registration_frame, text="USUARIO:").pack(pady=10)
-        tk.Entry(self.registration_frame, textvariable=self.username).pack(pady=10)
+        tk.Label(self.registration_frame, text="ID Operador:").pack(pady=5)
+        tk.Entry(self.registration_frame, textvariable=self.operator_id).pack(pady=5)
 
-        tk.Label(self.registration_frame, text="CONTRASEÑA:").pack(pady=10)
-        tk.Entry(self.registration_frame, textvariable=self.password, show="*").pack(pady=10)
+        tk.Label(self.registration_frame, text="Nombre:").pack(pady=5)
+        tk.Entry(self.registration_frame, textvariable=self.name).pack(pady=5)
 
-        tk.Button(self.registration_frame, text="REGISTRAR", command=self.registrar_operador).pack(pady=10)
+        tk.Label(self.registration_frame, text="Teléfono:").pack(pady=5)
+        tk.Entry(self.registration_frame, textvariable=self.phone).pack(pady=5)
 
-    def show_registration_frame(self):
-        self.login_frame.pack_forget()
-        self.registration_frame.pack(expand=True, fill='both')
-        self.keyboard_frame.pack(pady=10)  # Mantener el teclado en la pantalla de registro
+        tk.Label(self.registration_frame, text="Email:").pack(pady=5)
+        tk.Entry(self.registration_frame, textvariable=self.email).pack(pady=5)
+
+        tk.Label(self.registration_frame, text="Usuario:").pack(pady=5)
+        tk.Entry(self.registration_frame, textvariable=self.register_username).pack(pady=5)
+
+        tk.Label(self.registration_frame, text="Contraseña:").pack(pady=5)
+        tk.Entry(self.registration_frame, textvariable=self.register_password, show="*").pack(pady=5)
+
+        tk.Button(self.registration_frame, text="Registrar", command=self.register_user).pack(pady=10)
+        tk.Button(self.registration_frame, text="Volver", command=self.show_login).pack(pady=5)
 
     def create_keyboard(self):
         keys = [
@@ -105,77 +107,67 @@ class VirtualKeyboard(tk.Tk):
                 current_text = focused_widget.get()
                 focused_widget.delete(0, tk.END)
                 focused_widget.insert(0, current_text[:-1])
-            elif key == "ESPACIO":
-                focused_widget.insert(tk.END, ' ')
             else:
                 focused_widget.insert(tk.END, key)
 
-    # Función para verificar las credenciales con la base de datos
     def send_data(self):
-        usuario = self.username.get()
-        contrasena = self.password.get()
+        print(f"Usuario: {self.username.get()}")
+        print(f"Contraseña: {self.password.get()}")
 
-        # Verificar credenciales con la base de datos
-        if db_manager.verificar_operador(self.conn, usuario, contrasena):
-            print(f"Usuario: {usuario}")
-            print(f"Contraseña: {contrasena}")
+        # Ocultar el marco de inicio de sesión y mostrar el marco del viaje
+        self.login_frame.pack_forget()
+        self.trip_frame.pack(expand=True, fill='both')
 
-            # Hide the login frame and show the trip frame
-            self.login_frame.pack_forget()
-            self.trip_frame.pack(expand=True, fill='both')
+        # Ocultar el teclado después del inicio de sesión
+        self.keyboard_frame.pack_forget()
 
-            # Hide the keyboard after login
-            self.keyboard_frame.pack_forget()
-        else:
-            print("Error: Usuario o contraseña incorrectos")
+    def show_registration(self):
+        self.login_frame.pack_forget()
+        self.registration_frame.pack(expand=True, fill='both')
 
-    # Función para registrar nuevos operadores
-    def registrar_operador(self):
-        usuario = self.username.get()
-        contrasena = self.password.get()
-        nombre = self.nombre.get()
-        cedula = self.cedula.get()
-        telefono = self.telefono.get()
-
-        # Insertar el nuevo operador en la base de datos
-        db_manager.insertar_operador(self.conn, usuario, telefono, nombre, contrasena)
-        print(f"Usuario {usuario} registrado correctamente")
-
-        # Volver a la pantalla de inicio de sesión
+    def show_login(self):
         self.registration_frame.pack_forget()
         self.login_frame.pack(expand=True, fill='both')
-        self.keyboard_frame.pack(pady=10)  # Mostrar el teclado nuevamente
+
+    def register_user(self):
+        # Aquí puedes agregar la lógica para guardar el usuario en la base de datos
+        print(f"Registrando usuario: {self.register_username.get()}")
+        print(f"ID Operador: {self.operator_id.get()}, Nombre: {self.name.get()}, Teléfono: {self.phone.get()}, Email: {self.email.get()}, Contraseña: {self.register_password.get()}")
+        # Mensaje de éxito o lógica para agregar a la base de datos
+        self.status_message.set("Registrado exitosamente.")
+        self.show_login()  # Regresar al inicio de sesión después de registrar
 
     def start_gps(self):
         if self.gps_thread and self.gps_thread.is_alive():
             print("La lectura de GPS ya está en progreso.")
             return
 
-        # Clear the stop event before starting
+        # Limpiar el evento de parada antes de comenzar
         self.stop_event.clear()
 
-        # Start the GPS reading in a separate thread
+        # Iniciar la lectura de GPS en un hilo separado
         self.gps_thread = threading.Thread(
             target=manejarGPS,
             args=(self.stop_event,),
-            daemon=True  # Daemonize thread to exit when the main program exits
+            daemon=True  # Hacer que el hilo se cierre cuando se cierra el programa principal
         )
         self.gps_thread.start()
+        self.status_message.set("Lectura de GPS iniciada.")  # Actualizar el mensaje de estado
         print("Lectura de GPS iniciada.")
 
     def stop_gps(self):
         if self.gps_thread and self.gps_thread.is_alive():
-            # Signal the thread to stop
+            # Señalar al hilo que se detenga
             self.stop_event.set()
-            self.gps_thread.join()  # Wait for the thread to finish
+            self.gps_thread.join()  # Esperar a que el hilo termine
+            self.status_message.set("Lectura de GPS finalizada.")  # Actualizar el mensaje de estado
             print("Lectura de GPS finalizada.")
         else:
             print("La lectura de GPS no está en ejecución.")
 
     def on_closing(self):
-        # Ensure that the GPS thread is stopped before closing
+        # Asegurarse de que el hilo de GPS se detenga antes de cerrar
         self.stop_gps()
-        self.conn.close()  # Cerrar la conexión a la base de datos
         self.destroy()
 
 
