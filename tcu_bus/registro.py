@@ -1,11 +1,13 @@
 import tkinter as tk
 import sqlite3
 
+
 class RegistrationApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Registro de Operadores")
-        self.geometry("800x480")  # Ajustar a las dimensiones de la pantalla táctil
+        # Ajustar a las dimensiones de la pantalla táctil
+        self.geometry("800x480")
 
         # Crear base de datos y tabla si no existe
         self.create_database()
@@ -43,30 +45,40 @@ class RegistrationApp(tk.Tk):
 
     def create_widgets(self):
         # Usar grid para colocar los campos en 3 columnas y 2 filas
-        tk.Label(self, text="ID del Operador:").grid(row=0, column=0, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.operator_id).grid(row=0, column=1, padx=5, pady=5)
+        tk.Label(self, text="ID del Operador:").grid(
+            row=0, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.operator_id).grid(
+            row=0, column=1, padx=5, pady=5)
 
         tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.name).grid(row=0, column=3, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.name).grid(
+            row=0, column=3, padx=5, pady=5)
 
         tk.Label(self, text="Teléfono:").grid(row=1, column=0, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.phone).grid(row=1, column=1, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.phone).grid(
+            row=1, column=1, padx=5, pady=5)
 
         tk.Label(self, text="Email:").grid(row=1, column=2, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.email).grid(row=1, column=3, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.email).grid(
+            row=1, column=3, padx=5, pady=5)
 
         tk.Label(self, text="Usuario:").grid(row=2, column=0, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.username).grid(row=2, column=1, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.username).grid(
+            row=2, column=1, padx=5, pady=5)
 
-        tk.Label(self, text="Contraseña:").grid(row=2, column=2, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.password, show="*").grid(row=2, column=3, padx=5, pady=5)
+        tk.Label(self, text="Contraseña:").grid(
+            row=2, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.password,
+                 show="*").grid(row=2, column=3, padx=5, pady=5)
 
-        tk.Button(self, text="Registrar", command=self.register).grid(row=3, column=0, columnspan=4, pady=10)
+        tk.Button(self, text="Registrar", command=self.register).grid(
+            row=3, column=0, columnspan=4, pady=10)
 
         self.create_keyboard()
 
         # Label para mostrar el mensaje de registro
-        self.success_label = tk.Label(self, textvariable=self.message, fg="green")
+        self.success_label = tk.Label(
+            self, textvariable=self.message, fg="green")
         self.success_label.grid(row=4, column=0, columnspan=4)
 
     def create_keyboard(self):
@@ -77,10 +89,13 @@ class RegistrationApp(tk.Tk):
             'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BORRAR']
 
         self.keyboard_frame = tk.Frame(self)
-        self.keyboard_frame.grid(row=5, column=0, columnspan=4, pady=20)  # Posiciona el teclado debajo de los campos
+        # Posiciona el teclado debajo de los campos
+        self.keyboard_frame.grid(row=5, column=0, columnspan=4, pady=20)
 
         for key in keys:
-            button = tk.Button(self.keyboard_frame, text=key, width=5, command=lambda k=key: self.key_press(k))
+            button = tk.Button(self.keyboard_frame, text=key,
+                               width=5,
+                               command=lambda k=key: self.key_press(k))
             row, col = divmod(keys.index(key), 10)
             button.grid(row=row, column=col)
 
@@ -108,13 +123,15 @@ class RegistrationApp(tk.Tk):
         cursor = conn.cursor()
         try:
             cursor.execute('''
-                INSERT INTO operadores (operator_id, name, phone, email, username, password)
+                INSERT INTO operadores (operator_id, name, \
+                           phone, email, username, password)
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (operator_id, name, phone, email, username, password))
             conn.commit()
             self.message.set("Registro exitoso.")  # Actualizar el mensaje
         except sqlite3.IntegrityError:
-            self.message.set("Error: ID del operador ya existe.")  # Mensaje de error
+            # Mensaje de error
+            self.message.set("Error: ID del operador ya existe.")
         finally:
             conn.close()
 
@@ -125,6 +142,7 @@ class RegistrationApp(tk.Tk):
         self.email.set("")
         self.username.set("")
         self.password.set("")
+
 
 if __name__ == "__main__":
     app = RegistrationApp()

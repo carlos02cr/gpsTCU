@@ -1,5 +1,5 @@
 import serial
-import threading
+# import threading
 
 
 class DetenerLectura(Exception):
@@ -28,7 +28,8 @@ def manejarGPS(stop_event, process_gprmc_callback=print, port='/dev/serial0',
 
     try:
         with open(output_file, 'a') as file:
-            print(f"Guardando datos en {output_file}. Presione CTRL+C para salir.")
+            print(f"Guardando datos en {output_file}. \
+                  Presione CTRL+C para salir.")
             while not stop_event.is_set():
                 line_bytes = ser.readline()
                 if not line_bytes:
@@ -42,7 +43,8 @@ def manejarGPS(stop_event, process_gprmc_callback=print, port='/dev/serial0',
                 if line:
                     print(line)
                     file.write(line + '\n')
-                    if line.startswith('$GPRMC'):  # NMEA sentences start with '$'
+                    if line.startswith('$GPRMC'):
+                        # NMEA sentences start with '$'
                         process_gprmc_callback(line)
     except Exception as e:
         print(f"Error en manejarGPS: {e}")
