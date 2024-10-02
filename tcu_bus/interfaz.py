@@ -2,6 +2,7 @@ import tkinter as tk
 import threading
 # import subprocess
 from funcionesGPS import manejarGPS
+from registro import RegistrationApp
 
 
 class VirtualKeyboard(tk.Tk):
@@ -133,8 +134,16 @@ class VirtualKeyboard(tk.Tk):
         self.keyboard_frame.pack_forget()
 
     def show_registration(self):
-        self.login_frame.pack_forget()
-        self.registration_frame.pack(expand=True, fill='both')
+        self.withdraw()
+        # Pass the main window as an argument
+        registration_app = RegistrationApp(self)
+        registration_app.mainloop()
+        # self.login_frame.pack_forget()
+        # self.registration_frame.pack(expand=True, fill='both')
+
+    def return_to_main(self):
+        # Show the main window again when returning from registration
+        self.deiconify()
 
     def show_login(self):
         self.registration_frame.pack_forget()

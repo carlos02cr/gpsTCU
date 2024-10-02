@@ -2,9 +2,10 @@ import tkinter as tk
 import sqlite3
 
 
-class RegistrationApp(tk.Tk):
-    def __init__(self):
+class RegistrationApp(tk.Toplevel):
+    def __init__(self, main_app):
         super().__init__()
+        self.main_app = main_app  # Store the reference to the main window
         self.title("Registro de Operadores")
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
@@ -74,6 +75,9 @@ class RegistrationApp(tk.Tk):
         tk.Button(self, text="Registrar", command=self.register).grid(
             row=3, column=0, columnspan=4, pady=10)
 
+        tk.Button(self, text="Volver", command=self.volver).grid(
+            row=3, column=1, columnspan=4, pady=10)
+
         self.create_keyboard()
 
         # Label para mostrar el mensaje de registro
@@ -142,6 +146,10 @@ class RegistrationApp(tk.Tk):
         self.email.set("")
         self.username.set("")
         self.password.set("")
+
+    def volver(self):
+        self.destroy()  # Close the registration window
+        self.main_app.return_to_main()
 
 
 if __name__ == "__main__":
