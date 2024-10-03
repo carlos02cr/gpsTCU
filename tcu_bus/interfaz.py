@@ -1,8 +1,7 @@
 import tkinter as tk
 import threading
-# import subprocess
 from funcionesGPS import manejarGPS
-from registro import RegistrationApp
+from registro import RegistrationApp, verificar_operador
 
 
 class VirtualKeyboard(tk.Tk):
@@ -56,43 +55,6 @@ class VirtualKeyboard(tk.Tk):
         tk.Label(self.trip_frame, textvariable=self.status_message,
                  fg="green").pack(pady=10)
 
-        # Crear marco para la sección de registro (inicialmente oculta)
-        self.registration_frame = tk.Frame(self)
-
-        tk.Label(self.registration_frame, text="Registro").pack(pady=10)
-        self.operator_id = tk.StringVar()
-        self.name = tk.StringVar()
-        self.phone = tk.StringVar()
-        self.email = tk.StringVar()
-        self.register_username = tk.StringVar()
-        self.register_password = tk.StringVar()
-
-        tk.Label(self.registration_frame, text="ID Operador:").pack(pady=5)
-        tk.Entry(self.registration_frame,
-                 textvariable=self.operator_id).pack(pady=5)
-
-        tk.Label(self.registration_frame, text="Nombre:").pack(pady=5)
-        tk.Entry(self.registration_frame, textvariable=self.name).pack(pady=5)
-
-        tk.Label(self.registration_frame, text="Teléfono:").pack(pady=5)
-        tk.Entry(self.registration_frame, textvariable=self.phone).pack(pady=5)
-
-        tk.Label(self.registration_frame, text="Email:").pack(pady=5)
-        tk.Entry(self.registration_frame, textvariable=self.email).pack(pady=5)
-
-        tk.Label(self.registration_frame, text="Usuario:").pack(pady=5)
-        tk.Entry(self.registration_frame,
-                 textvariable=self.register_username).pack(pady=5)
-
-        tk.Label(self.registration_frame, text="Contraseña:").pack(pady=5)
-        tk.Entry(self.registration_frame,
-                 textvariable=self.register_password, show="*").pack(pady=5)
-
-        tk.Button(self.registration_frame, text="Registrar",
-                  command=self.register_user).pack(pady=10)
-        tk.Button(self.registration_frame, text="Volver",
-                  command=self.show_login).pack(pady=5)
-
     def create_keyboard(self):
         keys = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
@@ -123,15 +85,22 @@ class VirtualKeyboard(tk.Tk):
                 focused_widget.insert(tk.END, key)
 
     def send_data(self):
-        print(f"Usuario: {self.username.get()}")
-        print(f"Contraseña: {self.password.get()}")
 
-        # Ocultar el marco de inicio de sesión y mostrar el marco del viaje
-        self.login_frame.pack_forget()
-        self.trip_frame.pack(expand=True, fill='both')
+        usuario = self.username.get()
+        contraseña = self.password.get()
 
-        # Ocultar el teclado después del inicio de sesión
-        self.keyboard_frame.pack_forget()
+        if verificar_operador(usuario, contraseña):
+            print(f"Usuario: {usuario}")
+            print(f"Contraseña: {contraseña}")
+
+            # Ocultar el marco de inicio de sesión y mostrar el marco del viaje
+            self.login_frame.pack_forget()
+            self.trip_frame.pack(expand=True, fill='both')
+
+            # Ocultar el teclado después del inicio de sesión
+            self.keyboard_frame.pack_forget()
+        else:
+            print("Error: Usuario o contraseña incorrectos.")
 
     def show_registration(self):
         self.withdraw()
@@ -148,18 +117,6 @@ class VirtualKeyboard(tk.Tk):
     def show_login(self):
         self.registration_frame.pack_forget()
         self.login_frame.pack(expand=True, fill='both')
-
-    def register_user(self):
-        # Aquí puedes agregar la lógica
-        # para guardar el usuario en la base de datos
-        print(f"Registrando usuario: {self.register_username.get()}")
-        print(f"ID Operador: {self.operator_id.get()}, \
-              Nombre: {self.name.get()}, Teléfono: {self.phone.get()}, \
-                Email: {self.email.get()}, \
-                    Contraseña: {self.register_password.get()}")
-        # Mensaje de éxito o lógica para agregar a la base de datos
-        self.status_message.set("Registrado exitosamente.")
-        self.show_login()  # Regresar al inicio de sesión después de registrar
 
     def start_gps(self):
         if self.gps_thread and self.gps_thread.is_alive():

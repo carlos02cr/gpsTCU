@@ -1,5 +1,6 @@
 import tkinter as tk
 import sqlite3
+import bcrypt
 
 
 class RegistrationApp(tk.Toplevel):
@@ -150,6 +151,24 @@ class RegistrationApp(tk.Toplevel):
     def volver(self):
         self.destroy()  # Close the registration window
         self.main_app.return_to_main()
+
+
+def verificar_operador(nombre, password):
+    cursor = sqlite3.connect("operadores.db")
+    cursor.execute("SELECT password FROM operadores WHERE username =? ",
+                   (nombre))
+    resultado = cursor.fetchone()
+    if resultado:
+        hashed_password = resultado[0]
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            print("Usuario y contraseña correctos.")
+            return True
+        else:
+            print("Contraseña incorrecta.")
+            return False
+    else:
+        print("Usuario no encontrado.")
+        return False
 
 
 if __name__ == "__main__":
