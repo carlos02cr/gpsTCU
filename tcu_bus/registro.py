@@ -115,31 +115,30 @@ class RegistrationApp(tk.Toplevel):
                 focused_widget.insert(tk.END, key)
 
     def register(self):
-        # Obtener los datos de los campos
         operator_id = self.operator_id.get()
         name = self.name.get()
         phone = self.phone.get()
         email = self.email.get()
         username = self.username.get()
         password = self.password.get()
-
-        # Guardar en la base de datos
+    
+        # Hashear la contraseña antes de guardarla
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    
         conn = sqlite3.connect("operadores.db")
         cursor = conn.cursor()
         try:
             cursor.execute('''
-                INSERT INTO operadores (operator_id, name, \
-                           phone, email, username, password)
+                INSERT INTO operadores (operator_id, name, phone, email, username, password)
                 VALUES (?, ?, ?, ?, ?, ?)
-            ''', (operator_id, name, phone, email, username, password))
+            ''', (operator_id, name, phone, email, username, hashed_password))  # Almacenar el hash de la contraseña
             conn.commit()
-            self.message.set("Registro exitoso.")  # Actualizar el mensaje
+            self.message.set("Registro exitoso.")
         except sqlite3.IntegrityError:
-            # Mensaje de error
             self.message.set("Error: ID del operador ya existe.")
         finally:
             conn.close()
-
+    
         # Limpiar campos después del registro
         self.operator_id.set("")
         self.name.set("")
@@ -152,23 +151,18 @@ class RegistrationApp(tk.Toplevel):
         self.destroy()  # Close the registration window
         self.main_app.return_to_main()
 
-
-def verificar_operador(nombre, password):
-    cursor = sqlite3.connect("operadores.db")
-    cursor.execute("SELECT password FROM operadores WHERE username =? ",
-                   (nombre))
-    resultado = cursor.fetchone()
-    if resultado:
-        hashed_password = resultado[0]
-        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-            print("Usuario y contraseña correctos.")
-            return True
-        else:
-            print("Contraseña incorrecta.")
-            return False
-    else:
-        print("Usuario no encontrado.")
-        return False
+    def verificar_operador(nombre, password):
+        conn = sqlite3.connect("operadores.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT password FROM operadores WHERE username =?", (nombre,))
+        resultado = cursor.fetchone()
+        conn.close()  # Cerrar la conexión
+    
+        if resultado:
+            hashed_password = resultado[0]
+            if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+                return True  # La verificación es correcta
+        return False  # Usuario no encontrado o contraseña incorrecta
 
 
 if __name__ == "__main__":
