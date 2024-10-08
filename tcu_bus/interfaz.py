@@ -83,24 +83,45 @@ class VirtualKeyboard(tk.Tk):
                 focused_widget.insert(0, current_text[:-1])
             else:
                 focused_widget.insert(tk.END, key)
+    def verificar_operador(nombre, password):
+        conn = sqlite3.connect("operadores.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT password FROM operadores WHERE username =?", (nombre,))
+        resultado = cursor.fetchone()
+        conn.close()  # Cerrar la conexión
+    
+        if resultado:
+            hashed_password = resultado[0]
+            if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+                print("Usuario y contraseña correctos.")
+                return True
+            else:
+                print("Contraseña incorrecta.")
+                return False
+        else:
+            print("Usuario no encontrado.")
+            return False
 
     def send_data(self):
-
         usuario = self.username.get()
         contraseña = self.password.get()
-
+    
+        # Verificar si el usuario y la contraseña son correctos
         if verificar_operador(usuario, contraseña):
             print(f"Usuario: {usuario}")
             print(f"Contraseña: {contraseña}")
-
+    
             # Ocultar el marco de inicio de sesión y mostrar el marco del viaje
             self.login_frame.pack_forget()
             self.trip_frame.pack(expand=True, fill='both')
-
+    
             # Ocultar el teclado después del inicio de sesión
             self.keyboard_frame.pack_forget()
         else:
+            # Mensaje de error en la interfaz
+            self.status_message.set("Error: Usuario o contraseña incorrectos.")
             print("Error: Usuario o contraseña incorrectos.")
+
 
     def show_registration(self):
         self.withdraw()
