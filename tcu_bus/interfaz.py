@@ -173,4 +173,82 @@ class VirtualKeyboard(tk.Tk):
         self.login_frame.pack(expand=True, fill='both')
 
     def register_user(self):
-        # Registrar un
+        # Registrar un nuevo usuario, guardando los datos en un archivo CSV
+        file_exists = os.path.isfile('usuarios_registrados.csv')
+
+        # Crear un diccionario con los datos del usuario
+        user_data = {
+            "ID Operador": self.operator_id.get(),
+            "Nombre": self.name.get(),
+            "Teléfono": self.phone.get(),
+            "Email": self.email.get(),
+            "Usuario": self.register_username.get(),
+            "Contraseña": self.register_password.get()
+        }
+
+        # Guardar los datos en un archivo CSV
+        with open('usuarios_registrados.csv', mode='a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=user_data.keys())
+
+            # Si el archivo no existe, escribir los encabezados
+            if not file_exists:
+                writer.writeheader()
+
+            # Escribir los datos del usuario
+            writer.writerow(user_data)
+
+        # Vaciar los campos después de registrar al usuario
+        self.operator_id.set("")
+        self.name.set("")
+        self.phone.set("")
+        self.email.set("")
+        self.register_username.set("")
+        self.register_password.set("")
+
+        # Mostrar mensaje de éxito y volver al login
+        self.status_message.set("Registrado exitosamente.")
+        self.show_login()
+
+    def start_gps(self):
+        # Iniciar el GPS en un hilo separado
+        if self.gps_thread and self.gps_thread.is_alive():
+            print("La lectura de GPS ya está en progreso.")
+            return
+
+        # Limpiar el evento de parada antes de comenzar
+        self.stop_event.clear()
+
+        # Iniciar el hilo de GPS
+        self.gps_thread = threading.Thread(target=manejarGPS, args=(self.stop_event,), daemon=True)
+        self.gps_thread.start()
+        self.status_message.set("Lectura de GPS iniciada.")
+        print("Lectura de GPS iniciada.")
+
+    def stop_gps(self):
+        # Detener el hilo de GPS
+        if self.gps_thread and self.gps_thread.is_alive():
+            self.stop_event.set()  # Señalar que se detenga
+            self.gps_thread.join()  # Esperar a que el hilo termine
+            self.status_message.set("Lectura de GPS finalizada.")
+            print("Lectura de GPS finalizada.")
+        else:
+            print("La lectura de GPS no está en ejecución.")
+
+    def logout(self):
+        # Función para cerrar sesión, detener el GPS y volver al login
+        self.stop_gps()  # Detener el GPS si está activo
+        self.username.set("")  # Limpiar el campo de usuario
+        self.password.set("")  # Limpiar el campo de contraseña
+        self.keyboard_frame.pack(pady=10)  # Volver a mostrar el teclado
+        self.trip_frame.pack_forget()  # Ocultar el marco del viaje
+        self.login_frame.pack(expand=True, fill='both')  # Mostrar el login nuevamente
+
+    def on_closing(self):
+        # Asegurarse de que el GPS se detenga antes de cerrar la aplicación
+        self.stop_gps()
+        self.destroy()
+
+if __name__ == "__main__":
+    app = VirtualKeyboard()
+    app.protocol("WM_DELETE_WINDOW", app.on_closing)  # Manejar el cierre de la ventana
+    app.mainloop()
