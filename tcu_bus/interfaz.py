@@ -59,16 +59,16 @@ class RegistrationApp(tk.Toplevel):
         self.name_entry.grid(row=1, column=1, padx=10, pady=5)
 
         self.phone_entry = tk.Entry(self, textvariable=self.phone)
-        self.phone_entry.grid(row=2, column=1, padx=10, pady=5)
+        self.phone_entry.grid(row=2, column=2, padx=10, pady=5)
 
         self.email_entry = tk.Entry(self, textvariable=self.email)
-        self.email_entry.grid(row=3, column=1, padx=10, pady=5)
+        self.email_entry.grid(row=3, column=2, padx=10, pady=5)
 
         self.user_entry = tk.Entry(self, textvariable=self.register_username)
-        self.user_entry.grid(row=4, column=1, padx=10, pady=5)
+        self.user_entry.grid(row=4, column=3, padx=10, pady=5)
 
         self.pass_entry = tk.Entry(self, textvariable=self.register_password, show="*")
-        self.pass_entry.grid(row=5, column=1, padx=10, pady=5)
+        self.pass_entry.grid(row=5, column=3, padx=10, pady=5)
 
         # Botón para registrar el usuario (ocupa ambas columnas)
         tk.Button(self, text="Registrar", command=self.register_user).grid(row=6, column=0, columnspan=2, pady=10)
