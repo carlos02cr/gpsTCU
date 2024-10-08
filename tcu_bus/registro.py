@@ -32,10 +32,11 @@ class RegistrationApp(tk.Tk):
         conn = sqlite3.connect("operadores.db")
         cursor = conn.cursor()
         # Crear tabla si no existe
-        cursor.execute('''
+        cursor.execute(
             CREATE TABLE IF NOT EXISTS operadores (
                 operator_id TEXT PRIMARY KEY,
-@@ -42,7 +38,6 @@ def create_database(self):
+                
+
         conn.close()
 
     def create_widgets(self):
@@ -43,7 +44,7 @@ class RegistrationApp(tk.Tk):
         tk.Label(self, text="ID del Operador:").grid(row=0, column=0, padx=5, pady=5)
         tk.Entry(self, textvariable=self.operator_id).grid(row=0, column=1, padx=5, pady=5)
 
-@@ -61,70 +56,27 @@ def create_widgets(self):
+    def create_widgets(self):
         tk.Label(self, text="Contraseña:").grid(row=2, column=2, padx=5, pady=5)
         tk.Entry(self, textvariable=self.password, show="*").grid(row=2, column=3, padx=5, pady=5)
 
