@@ -40,40 +40,39 @@ class RegistrationFrame(tk.Frame):
         conn.close()
 
     def create_widgets(self):
-        # Configure grid columns for proper alignment (3 columns)
-        for i in range(6):  # 3 pairs of labels and entries
+        # Configure grid columns for proper alignment
+        for i in range(2):  # Assuming 2 columns: labels and entries
             self.grid_columnconfigure(i, weight=1, pad=10)
 
-        # Row 0 (ID del Operador, Nombre, Teléfono)
+        # Labels and Entry widgets
         tk.Label(self, text="ID del Operador:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
         tk.Entry(self, textvariable=self.operator_id).grid(row=0, column=1, padx=5, pady=5, sticky='we')
 
-        tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=5, sticky='e')
-        tk.Entry(self, textvariable=self.name).grid(row=0, column=3, padx=5, pady=5, sticky='we')
+        tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=5, pady=5, sticky='e')
+        tk.Entry(self, textvariable=self.name).grid(row=1, column=1, padx=5, pady=5, sticky='we')
 
-        tk.Label(self, text="Teléfono:").grid(row=0, column=4, padx=5, pady=5, sticky='e')
-        tk.Entry(self, textvariable=self.phone).grid(row=0, column=5, padx=5, pady=5, sticky='we')
+        tk.Label(self, text="Teléfono:").grid(row=2, column=0, padx=5, pady=5, sticky='e')
+        tk.Entry(self, textvariable=self.phone).grid(row=2, column=1, padx=5, pady=5, sticky='we')
 
-        # Row 1 (Email, Usuario, Contraseña)
-        tk.Label(self, text="Email:").grid(row=1, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(self, textvariable=self.email).grid(row=1, column=1, padx=5, pady=5, sticky='we')
+        tk.Label(self, text="Email:").grid(row=3, column=0, padx=5, pady=5, sticky='e')
+        tk.Entry(self, textvariable=self.email).grid(row=3, column=1, padx=5, pady=5, sticky='we')
 
-        tk.Label(self, text="Usuario:").grid(row=1, column=2, padx=5, pady=5, sticky='e')
-        tk.Entry(self, textvariable=self.username).grid(row=1, column=3, padx=5, pady=5, sticky='we')
+        tk.Label(self, text="Usuario:").grid(row=4, column=0, padx=5, pady=5, sticky='e')
+        tk.Entry(self, textvariable=self.username).grid(row=4, column=1, padx=5, pady=5, sticky='we')
 
-        tk.Label(self, text="Contraseña:").grid(row=1, column=4, padx=5, pady=5, sticky='e')
-        tk.Entry(self, textvariable=self.password, show="*").grid(row=1, column=5, padx=5, pady=5, sticky='we')
+        tk.Label(self, text="Contraseña:").grid(row=5, column=0, padx=5, pady=5, sticky='e')
+        tk.Entry(self, textvariable=self.password, show="*").grid(row=5, column=1, padx=5, pady=5, sticky='we')
 
-        # Register and Back buttons (across the entire width)
-        tk.Button(self, text="Registrar", command=self.register).grid(row=2, column=0, columnspan=6, pady=10)
-        tk.Button(self, text="Volver", command=self.volver).grid(row=3, column=0, columnspan=6, pady=5)
-
-        # Label to display registration messages
-        self.success_label = tk.Label(self, textvariable=self.message, fg="green")
-        self.success_label.grid(row=4, column=0, columnspan=6, pady=10)
+        # Register and Back buttons
+        tk.Button(self, text="Registrar", command=self.register).grid(row=6, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Volver", command=self.volver).grid(row=7, column=0, columnspan=2, pady=5)
 
         # Create the keyboard within the registration frame
         self.create_keyboard()
+
+        # Label to display registration messages
+        self.success_label = tk.Label(self, textvariable=self.message, fg="green")
+        self.success_label.grid(row=8, column=0, columnspan=2, pady=10)
 
     def create_keyboard(self):
         keys = [
@@ -84,7 +83,7 @@ class RegistrationFrame(tk.Frame):
         ]
 
         keyboard_frame = tk.Frame(self)
-        keyboard_frame.grid(row=5, column=0, columnspan=6, pady=20)
+        keyboard_frame.grid(row=9, column=0, columnspan=2, pady=20)
 
         for index, key in enumerate(keys):
             button = tk.Button(keyboard_frame, text=key, width=5,
@@ -137,3 +136,4 @@ class RegistrationFrame(tk.Frame):
 
     def volver(self):
         self.parent.return_to_main()
+
