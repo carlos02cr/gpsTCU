@@ -1,12 +1,14 @@
 import tkinter as tk
 import sqlite3
-import subprocess
+import bcrypt
 
-class RegistrationApp(tk.Tk):
-    def __init__(self):
+
+class RegistrationApp(tk.Toplevel):
+    def __init__(self, main_app):
         super().__init__()
+        self.main_app = main_app  # Store the reference to the main window
         self.title("Registro de Operadores")
-        self.geometry("800x480")  # Ajustar a las dimensiones de la pantalla táctil
+        # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
 
         # Crear base de datos y tabla si no existe
@@ -20,40 +22,68 @@ class RegistrationApp(tk.Tk):
         self.username = tk.StringVar()
         self.password = tk.StringVar()
         self.message = tk.StringVar()  # Variable para el mensaje de registro
-        self.message = tk.StringVar()
 
         # Crear widgets de la interfaz
         self.create_widgets()
         self.keyboard_frame = None  # Inicializar el teclado
-        self.keyboard_frame = None
 
     def create_database(self):
         # Conectar a la base de datos (se crea si no existe)
         conn = sqlite3.connect("operadores.db")
         cursor = conn.cursor()
         # Crear tabla si no existe
-        cursor.execute(
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS operadores (
                 operator_id TEXT PRIMARY KEY,
-                
-
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
         conn.close()
 
     def create_widgets(self):
         # Usar grid para colocar los campos en 3 columnas y 2 filas
-        tk.Label(self, text="ID del Operador:").grid(row=0, column=0, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.operator_id).grid(row=0, column=1, padx=5, pady=5)
+        tk.Label(self, text="ID del Operador:").grid(
+            row=0, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.operator_id).grid(
+            row=0, column=1, padx=5, pady=5)
 
-    def create_widgets(self):
-        tk.Label(self, text="Contraseña:").grid(row=2, column=2, padx=5, pady=5)
-        tk.Entry(self, textvariable=self.password, show="*").grid(row=2, column=3, padx=5, pady=5)
+        tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.name).grid(
+            row=0, column=3, padx=5, pady=5)
 
-        tk.Button(self, text="Registrar", command=self.register).grid(row=3, column=0, columnspan=4, pady=10)
+        tk.Label(self, text="Teléfono:").grid(row=1, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.phone).grid(
+            row=1, column=1, padx=5, pady=5)
+
+        tk.Label(self, text="Email:").grid(row=1, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.email).grid(
+            row=1, column=3, padx=5, pady=5)
+
+        tk.Label(self, text="Usuario:").grid(row=2, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.username).grid(
+            row=2, column=1, padx=5, pady=5)
+
+        tk.Label(self, text="Contraseña:").grid(
+            row=2, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.password,
+                 show="*").grid(row=2, column=3, padx=5, pady=5)
+
+        tk.Button(self, text="Registrar", command=self.register).grid(
+            row=3, column=0, columnspan=4, pady=10)
+
+        tk.Button(self, text="Volver", command=self.volver).grid(
+            row=3, column=1, columnspan=4, pady=10)
 
         self.create_keyboard()
 
         # Label para mostrar el mensaje de registro
-        self.success_label = tk.Label(self, textvariable=self.message, fg="green")
+        self.success_label = tk.Label(
+            self, textvariable=self.message, fg="green")
         self.success_label.grid(row=4, column=0, columnspan=4)
 
     def create_keyboard(self):
@@ -64,10 +94,13 @@ class RegistrationApp(tk.Tk):
             'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BORRAR']
 
         self.keyboard_frame = tk.Frame(self)
-        self.keyboard_frame.grid(row=5, column=0, columnspan=4, pady=20)  # Posiciona el teclado debajo de los campos
+        # Posiciona el teclado debajo de los campos
+        self.keyboard_frame.grid(row=5, column=0, columnspan=4, pady=20)
 
         for key in keys:
-            button = tk.Button(self.keyboard_frame, text=key, width=5, command=lambda k=key: self.key_press(k))
+            button = tk.Button(self.keyboard_frame, text=key,
+                               width=5,
+                               command=lambda k=key: self.key_press(k))
             row, col = divmod(keys.index(key), 10)
             button.grid(row=row, column=col)
 
@@ -91,22 +124,19 @@ class RegistrationApp(tk.Tk):
         password = self.password.get()
 
         # Guardar en la base de datos
-        tk.Button(self, text="Registrar", command=self.register_user).grid(row=3, column=0, columnspan=4, pady=10)
-
-        tk.Label(self, textvariable=self.message, fg="green").grid(row=4, column=0, columnspan=4, pady=10)
-
-    def register_user(self):
         conn = sqlite3.connect("operadores.db")
         cursor = conn.cursor()
         try:
             cursor.execute('''
-                INSERT INTO operadores (operator_id, name, phone, email, username, password)
+                INSERT INTO operadores (operator_id, name, \
+                           phone, email, username, password)
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (operator_id, name, phone, email, username, password))
             conn.commit()
             self.message.set("Registro exitoso.")  # Actualizar el mensaje
         except sqlite3.IntegrityError:
-            self.message.set("Error: ID del operador ya existe.")  # Mensaje de error
+            # Mensaje de error
+            self.message.set("Error: ID del operador ya existe.")
         finally:
             conn.close()
 
@@ -118,19 +148,29 @@ class RegistrationApp(tk.Tk):
         self.username.set("")
         self.password.set("")
 
-        cursor.execute("INSERT INTO operadores (operator_id, name, phone, email, username, password) VALUES (?, ?, ?, ?, ?, ?)",
-                       (self.operator_id.get(), self.name.get(), self.phone.get(), self.email.get(), self.username.get(), self.password.get()))
+    def volver(self):
+        self.destroy()  # Close the registration window
+        self.main_app.return_to_main()
 
-        conn.commit()
-        conn.close()
 
-        self.message.set("Registro exitoso.")
-        print(f"Registrado: {self.username.get()}")
-        subprocess.Popen(
-            ["C:/Users/perry/AppData/Local/Programs/Python/Python312/python.exe", 
-             "c:/Users/perry/OneDrive/Escritorio/busTCU/gpsTCU/tcu_bus/interfaz.py"] # modificar esta direccion con la de la raspe
-        )
-        self.destroy()  # Cierra la ventana de interfaz.py
+def verificar_operador(nombre, password):
+    cursor = sqlite3.connect("operadores.db")
+    cursor.execute("SELECT password FROM operadores WHERE username =? ",
+                   (nombre))
+    resultado = cursor.fetchone()
+    if resultado:
+        hashed_password = resultado[0]
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            print("Usuario y contraseña correctos.")
+            return True
+        else:
+            print("Contraseña incorrecta.")
+            return False
+    else:
+        print("Usuario no encontrado.")
+        return False
+
 
 if __name__ == "__main__":
     app = RegistrationApp()
+    app.mainloop()
