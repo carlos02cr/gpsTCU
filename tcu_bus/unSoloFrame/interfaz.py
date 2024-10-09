@@ -42,20 +42,13 @@ class RegistrationApp(tk.Toplevel):
         # Crear la interfaz de registro
         self.create_widgets()
 
-<<<<<<< HEAD
-    def  create_widgets(self):
-        # Primera columna (etiquetas: ID, Nombre, Teléfono)
-        tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=1, pady=5, sticky="w")
-        tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=1, pady=5, sticky="w")
-        tk.Label(self, text="Teléfono:").grid(row=2, column=0, padx=1, pady=5, sticky="w")
-=======
     def create_widgets(self):
         # Usar grid para colocar los campos en 3 columnas y 2 filas
         tk.Label(self, text="ID del Operador:").grid(
             row=0, column=0, padx=5, pady=5)
         tk.Entry(self, textvariable=self.operator_id).grid(
             row=0, column=1, padx=5, pady=5)
->>>>>>> refs/remotes/origin/cambiosJusthin
+
 
         tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=5)
         tk.Entry(self, textvariable=self.name).grid(
