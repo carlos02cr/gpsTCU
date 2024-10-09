@@ -40,8 +40,7 @@ class RegistrationApp(tk.Toplevel):
         # Crear la interfaz de registro
         self.create_widgets()
 
-    
-   def create_widgets(self):
+    def  create_widgets(self):
         # Primera columna (etiquetas: ID, Nombre, Teléfono)
         tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=1, pady=5, sticky="w")
         tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=1, pady=5, sticky="w")
