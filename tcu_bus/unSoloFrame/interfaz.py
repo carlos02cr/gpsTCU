@@ -41,11 +41,12 @@ class RegistrationApp(tk.Toplevel):
         self.create_widgets()
 
     
-    def create_widgets(self):
+   def create_widgets(self):
         # Primera columna (etiquetas: ID, Nombre, Teléfono)
-        tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        tk.Label(self, text="Teléfono:").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=1, pady=5, sticky="w")
+        tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=1, pady=5, sticky="w")
+        tk.Label(self, text="Teléfono:").grid(row=2, column=0, padx=1, pady=5, sticky="w")
+
 
     # Segunda columna (campos de entrada: ID, Nombre, Teléfono)
         self.id_entry = tk.Entry(self, textvariable=self.operator_id)
