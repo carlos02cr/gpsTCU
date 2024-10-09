@@ -2,11 +2,11 @@ import serial
 import requests
 import time
 
-# Configuración del puerto serial
+# Configuración del puerto serial (ajusta el nombre del puerto según sea necesario)
 ser = serial.Serial('/dev/serial10', 9600, timeout=1)
 
-# URL de la API
-url = 'https://realtime.bucr.digital/api/position'
+# URL de la API real o de prueba
+url = 'https://httpbin.org/post'  # Cambia esto por tu URL real cuando estés listo
 
 def parse_gprmc(data):
     """Parsea una línea GPRMC para extraer latitud y longitud."""
@@ -53,7 +53,7 @@ while True:
                 "odometer": 0.0
             }
 
-            # Envía los datos a la API
+            # Envía los datos a la API real o de prueba
             response = requests.post(url, json=data)
             print(f"Enviando datos: {data}")
             print(f"Respuesta de la API: {response.status_code}, {response.text}")
