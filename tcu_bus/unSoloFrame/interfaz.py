@@ -44,12 +44,12 @@ class RegistrationApp(tk.Toplevel):
         # Configuramos una cuadrícula con dos columnas para los campos de entrada y etiquetas
 
         # Primera columna (etiquetas)
-        tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=10, pady=5, sticky="e")
-        tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=10, pady=5, sticky="e")
-        tk.Label(self, text="Teléfono:").grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        tk.Label(self, text="Email:").grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        tk.Label(self, text="Usuario:").grid(row=4, column=0, padx=10, pady=5, sticky="e")
-        tk.Label(self, text="Contraseña:").grid(row=5, column=0, padx=10, pady=5, sticky="e")
+        tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="Teléfono:").grid(row=2, column=2, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="Email:").grid(row=0, column=2, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="Usuario:").grid(row=1, column=2, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="Contraseña:").grid(row=2, column=2, padx=10, pady=5, sticky="w")
 
         # Segunda columna (campos de entrada)
         self.id_entry = tk.Entry(self, textvariable=self.operator_id)
@@ -62,13 +62,13 @@ class RegistrationApp(tk.Toplevel):
         self.phone_entry.grid(row=2, column=1, padx=10, pady=5)
 
         self.email_entry = tk.Entry(self, textvariable=self.email)
-        self.email_entry.grid(row=3, column=1, padx=10, pady=5)
+        self.email_entry.grid(row=0, column=3, padx=10, pady=5)
 
         self.user_entry = tk.Entry(self, textvariable=self.register_username)
-        self.user_entry.grid(row=4, column=1, padx=10, pady=5)
+        self.user_entry.grid(row=1, column=3, padx=10, pady=5)
 
         self.pass_entry = tk.Entry(self, textvariable=self.register_password, show="*")
-        self.pass_entry.grid(row=5, column=1, padx=10, pady=5)
+        self.pass_entry.grid(row=2, column=3, padx=10, pady=5)
 
         # Botón para registrar el usuario (ocupa ambas columnas)
         tk.Button(self, text="Registrar", command=self.register_user).grid(row=6, column=0, columnspan=2, pady=10)
@@ -389,6 +389,5 @@ if __name__ == "__main__":
     app = VirtualKeyboard()
     app.protocol("WM_DELETE_WINDOW", app.on_closing)
     app.mainloop()
-
 
 
