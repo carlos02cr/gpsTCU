@@ -3,6 +3,8 @@ import threading
 import csv
 import os
 from funcionesGPS import manejarGPS
+import sqlite3
+import bcrypt
 
 
 # Función para verificar las credenciales del operador en el archivo CSV
@@ -40,51 +42,49 @@ class RegistrationApp(tk.Toplevel):
         # Crear la interfaz de registro
         self.create_widgets()
 
+<<<<<<< HEAD
     def  create_widgets(self):
         # Primera columna (etiquetas: ID, Nombre, Teléfono)
         tk.Label(self, text="ID Operador:").grid(row=0, column=0, padx=1, pady=5, sticky="w")
         tk.Label(self, text="Nombre:").grid(row=1, column=0, padx=1, pady=5, sticky="w")
         tk.Label(self, text="Teléfono:").grid(row=2, column=0, padx=1, pady=5, sticky="w")
+=======
+    def create_widgets(self):
+        # Usar grid para colocar los campos en 3 columnas y 2 filas
+        tk.Label(self, text="ID del Operador:").grid(
+            row=0, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.operator_id).grid(
+            row=0, column=1, padx=5, pady=5)
+>>>>>>> refs/remotes/origin/cambiosJusthin
 
+        tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.name).grid(
+            row=0, column=3, padx=5, pady=5)
 
-    # Segunda columna (campos de entrada: ID, Nombre, Teléfono)
-        self.id_entry = tk.Entry(self, textvariable=self.operator_id)
-        self.id_entry.grid(row=0, column=1, padx=10, pady=5)
+        tk.Label(self, text="Teléfono:").grid(row=1, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.phone).grid(
+            row=1, column=1, padx=5, pady=5)
 
-        self.name_entry = tk.Entry(self, textvariable=self.name)
-        self.name_entry.grid(row=1, column=1, padx=10, pady=5)
+        tk.Label(self, text="Email:").grid(row=1, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.email).grid(
+            row=1, column=3, padx=5, pady=5)
 
-        self.phone_entry = tk.Entry(self, textvariable=self.phone)
-        self.phone_entry.grid(row=2, column=1, padx=10, pady=5)
+        tk.Label(self, text="Usuario:").grid(row=2, column=0, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.username).grid(
+            row=2, column=1, padx=5, pady=5)
 
-        # Tercera columna (etiquetas: Email, Usuario, Contraseña)
-        tk.Label(self, text="Email:").grid(row=0, column=2, padx=10, pady=5, sticky="w")
-        tk.Label(self, text="Usuario:").grid(row=1, column=2, padx=10, pady=5, sticky="w")
-        tk.Label(self, text="Contraseña:").grid(row=2, column=2, padx=10, pady=5, sticky="w")
+        tk.Label(self, text="Contraseña:").grid(
+            row=2, column=2, padx=5, pady=5)
+        tk.Entry(self, textvariable=self.password,
+                 show="*").grid(row=2, column=3, padx=5, pady=5)
 
-    # Cuarta columna (campos de entrada: Email, Usuario, Contraseña)
-        self.email_entry = tk.Entry(self, textvariable=self.email)
-        self.email_entry.grid(row=0, column=3, padx=10, pady=5)
+        tk.Button(self, text="Registrar", command=self.register).grid(
+            row=3, column=0, columnspan=4, pady=10)
 
-        self.user_entry = tk.Entry(self, textvariable=self.register_username)
-        self.user_entry.grid(row=1, column=3, padx=10, pady=5)
+        tk.Button(self, text="Volver", command=self.volver).grid(
+            row=3, column=1, columnspan=4, pady=10)
 
-        self.pass_entry = tk.Entry(self, textvariable=self.register_password, show="*")
-        self.pass_entry.grid(row=2, column=3, padx=10, pady=5)
-
-        # Botón para registrar el usuario (ocupa 4 columnas)
-        tk.Button(self, text="Registrar", command=self.register_user).grid(row=6, column=0, columnspan=4, pady=10)
-
-        # Botón para volver atrás al login (ocupa 4 columnas)
-        tk.Button(self, text="Volver al Login", command=self.close_window).grid(row=7, column=0, columnspan=4, pady=10)
-
-        # Label para mostrar el mensaje de éxito (ocupa 4 columnas)
-        self.success_label = tk.Label(self, textvariable=self.registration_message, fg="green")
-        self.success_label.grid(row=8, column=0, columnspan=4, pady=10)
-
-        # Añadir el teclado en la ventana de registro
         self.create_keyboard()
-
 
         # Label para mostrar el mensaje de registro
         self.success_label = tk.Label(
