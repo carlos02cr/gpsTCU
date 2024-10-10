@@ -95,7 +95,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         usuario = self.username.get()
         contraseña = self.password.get()
 
-        if self.verificar_operador(self, usuario, contraseña):
+        if self.verificarLogin(self, usuario, contraseña):
             print(f"Usuario: {usuario}")
             print(f"Contraseña: {contraseña}")
 

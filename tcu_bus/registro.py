@@ -4,7 +4,89 @@ import re
 # import bcrypt
 
 
-class InterfazRegistro(tk.Toplevel):
+class funcRegistro:
+    def __init__(self):
+        pass
+
+    def create_database(self):
+        # Conectar a la base de datos (se crea si no existe)
+        conn = sqlite3.connect("operadores.db")
+        cursor = conn.cursor()
+        # Crear tabla si no existe
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS operadores (
+                operator_id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+        conn.close()
+
+    def verificarLogin(self, interface, nombre, password):
+        # create_database()
+        con = sqlite3.connect("operadores.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT password FROM operadores" +
+                       f" WHERE username = '{nombre}'")
+        resultado = cursor.fetchone()
+        if resultado:
+            # hashed_password = resultado[0]
+            # bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            if password == resultado[0]:
+                interface.status_message.set("Usuario y contraseña correctos.")
+                print("Usuario y contraseña correctos.")
+                return True
+            else:
+                interface.status_login.set("Contraseña incorrecta.")
+                print("Contraseña incorrecta.")
+                return False
+        else:
+            interface.status_login.set("Usuario no encontrado.")
+            print("Usuario no encontrado.")
+            return False
+
+    def verificarRegistro(self, operator_id, name,
+                          phone, email, username, password):
+
+        if not re.match("^[0-9]{1,8}$", operator_id):
+            raise ValueError("ID inválido, debe ser "
+                             "numérico.")
+
+        if not re.match("^[0-9]{8}$", phone):
+            raise ValueError("Número de teléfono inválido,"
+                             " deben ser 8 números.")
+
+        email_pattern = re.compile(
+            r"^[a-zA-Z0-9_.+-]+@"      # Parte local del email
+            r"[a-zA-Z0-9-]+\."         # Nombre del dominio
+            r"[a-zA-Z0-9-.]+$"         # Extensión
+        )
+
+        if not re.match(email_pattern, email):
+            raise ValueError("Correo electrónico inválido.")
+
+        if not re.match("^[a-zA-Z0-9]{1,10}$", username):
+            raise ValueError("Username inválido debe ser "
+                             "menos de 10 letras o números.")
+
+        if not re.match("^[a-zA-Z0-9]{1,10}$", username):
+            raise ValueError("Username inválido debe ser "
+                             "menos de 10 letras o números.")
+
+        if not re.match("^[a-zA-Z\\s]{1,20}$", name):
+            raise ValueError("Nombre inválido debe ser "
+                             "letras o espacios y menos de 20 caracteres.")
+
+        if not re.match("^[a-zA-Z0-9]{4,20}$", password):
+            raise ValueError("Contraseña incorrecta, debe contener solo "
+                             " letras y números y tener al menos 4 de estos.")
+
+
+class InterfazRegistro(tk.Toplevel, funcRegistro):
     def __init__(self, main_app):
         super().__init__()
         self.main_app = main_app  # Store the reference to the main window
@@ -39,7 +121,8 @@ class InterfazRegistro(tk.Toplevel):
         tk.Entry(self, textvariable=self.operator_id).grid(
             row=0, column=1, padx=5, pady=7)
 
-        tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=7)
+        tk.Label(self, text="Nombre y Apellido:").grid(
+            row=0, column=2, padx=5, pady=7)
         tk.Entry(self, textvariable=self.name).grid(
             row=0, column=3, padx=5, pady=7)
 
@@ -51,7 +134,8 @@ class InterfazRegistro(tk.Toplevel):
         tk.Entry(self, textvariable=self.email).grid(
             row=1, column=3, padx=5, pady=7)
 
-        tk.Label(self, text="Usuario:").grid(row=2, column=0, padx=5, pady=7)
+        tk.Label(self, text="Nombre de usuario:").grid(
+            row=2, column=0, padx=5, pady=7)
         tk.Entry(self, textvariable=self.username).grid(
             row=2, column=1, padx=5, pady=7)
 
@@ -114,6 +198,8 @@ class InterfazRegistro(tk.Toplevel):
         conn = sqlite3.connect("operadores.db")
         cursor = conn.cursor()
         try:
+            self.verificarRegistro(operator_id, name, phone,
+                                   email, username, password)
             cursor.execute('''
                 INSERT INTO operadores (operator_id, name, \
                            phone, email, username, password)
@@ -121,83 +207,29 @@ class InterfazRegistro(tk.Toplevel):
             ''', (operator_id, name, phone, email, username, password))
             conn.commit()
             self.message.set("Registro exitoso.")  # Actualizar el mensaje
+
+            # Limpiar campos después del registro
+            self.operator_id.set("")
+            self.name.set("")
+            self.phone.set("")
+            self.email.set("")
+            self.username.set("")
+            self.password.set("")
+
         except sqlite3.IntegrityError:
             # Mensaje de error
             self.message.set("Error: ID del operador ya existe.")
+
+        # Mensaje de error cuando los datos a registrar no son apropiados.
+        except ValueError as e:
+            self.message.set(str(e))
+
         finally:
             conn.close()
-
-        # Limpiar campos después del registro
-        self.operator_id.set("")
-        self.name.set("")
-        self.phone.set("")
-        self.email.set("")
-        self.username.set("")
-        self.password.set("")
 
     def volver(self):
         self.destroy()  # Close the registration window
         self.main_app.return_to_main()
-
-
-class funcRegistro:
-    def __init__(self):
-        pass
-
-    def create_database(self):
-        # Conectar a la base de datos (se crea si no existe)
-        conn = sqlite3.connect("operadores.db")
-        cursor = conn.cursor()
-        # Crear tabla si no existe
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS operadores (
-                operator_id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL,
-                username TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        ''')
-        conn.commit()
-        conn.close()
-
-    def verificar_operador(self, interface, nombre, password):
-        # create_database()
-        con = sqlite3.connect("operadores.db")
-        cursor = con.cursor()
-        cursor.execute("SELECT password FROM operadores" +
-                       f" WHERE username = '{nombre}'")
-        resultado = cursor.fetchone()
-        if resultado:
-            # hashed_password = resultado[0]
-            # bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-            if password == resultado[0]:
-                interface.status_message.set("Usuario y contraseña correctos.")
-                print("Usuario y contraseña correctos.")
-                return True
-            else:
-                interface.status_login.set("Contraseña incorrecta.")
-                print("Contraseña incorrecta.")
-                return False
-        else:
-            interface.status_login.set("Usuario no encontrado.")
-            print("Usuario no encontrado.")
-            return False
-
-    def verificarRegistro(self, operator_id, name,
-                          phone, email, username, password):
-        if not re.match("^[0-9]{8}$", phone):
-            raise ValueError("Número de teléfono inválido,"
-                             " deben ser 8 números.")
-
-        email_pattern = re.compile(
-            r"^[a-zA-Z0-9_.+-]+@"      # Parte local del email
-            r"[a-zA-Z0-9-]+\."         # Nombre del dominio
-            r"[a-zA-Z0-9-.]+$"         # Extensión
-        )
-        if not re.match(email_pattern, email):
-            raise ValueError("Correo electrónico inválido.")
 
 
 if __name__ == "__main__":
