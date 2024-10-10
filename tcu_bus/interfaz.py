@@ -1,11 +1,10 @@
 import tkinter as tk
 import threading
-import sqlite3
 from funcionesGPS import manejarGPS
-from registro import RegistrationApp, verificar_operador
+from registro import InterfazRegistro, funcRegistro
 
 
-class VirtualKeyboard(tk.Tk):
+class InterfazMain(tk.Tk, funcRegistro):
     def __init__(self):
         super().__init__()
         self.title("INICIO DE SESION")
@@ -21,35 +20,22 @@ class VirtualKeyboard(tk.Tk):
         self.create_database()
         self.create_widgets()
 
-    def create_database(self):
-        # Conectar a la base de datos (se crea si no existe)
-        conn = sqlite3.connect("operadores.db")
-        cursor = conn.cursor()
-        # Crear tabla si no existe
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS operadores (
-                operator_id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL,
-                username TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        ''')
-        conn.commit()
-        conn.close()
-
     def create_widgets(self):
         # Crear un marco para el inicio de sesión
         self.login_frame = tk.Frame(self)
         self.login_frame.pack(expand=True, fill='both')
 
-        tk.Label(self.login_frame, text="USUARIO:").pack(pady=10)
-        tk.Entry(self.login_frame, textvariable=self.username).pack(pady=10)
+        tk.Label(self.login_frame, text="USUARIO:").pack(pady=5)
+        tk.Entry(self.login_frame, textvariable=self.username).pack(pady=5)
 
-        tk.Label(self.login_frame, text="CONTRASEÑA:").pack(pady=10)
+        tk.Label(self.login_frame, text="CONTRASEÑA:").pack(pady=5)
         tk.Entry(self.login_frame, textvariable=self.password,
-                 show="*").pack(pady=10)
+                 show="*").pack(pady=5)
+
+        # Label para mostrar mensajes de estado de inicio
+        self.status_login = tk.StringVar()
+        tk.Label(self.login_frame, textvariable=self.status_login,
+                 fg="red").pack(pady=1)
 
         # Crear el teclado y almacenarlo en self.keyboard_frame
         self.keyboard_frame = tk.Frame(self.login_frame)
@@ -109,7 +95,7 @@ class VirtualKeyboard(tk.Tk):
         usuario = self.username.get()
         contraseña = self.password.get()
 
-        if verificar_operador(usuario, contraseña):
+        if self.verificar_operador(self, usuario, contraseña):
             print(f"Usuario: {usuario}")
             print(f"Contraseña: {contraseña}")
 
@@ -125,17 +111,15 @@ class VirtualKeyboard(tk.Tk):
     def show_registration(self):
         self.withdraw()
         # Pass the main window as an argument
-        registration_app = RegistrationApp(self)
+        registration_app = InterfazRegistro(self)
         registration_app.mainloop()
-        # self.login_frame.pack_forget()
-        # self.registration_frame.pack(expand=True, fill='both')
+        registration_app.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def return_to_main(self):
-        # Show the main window again when returning from registration
         self.deiconify()
 
     def show_login(self):
-        self.registration_frame.pack_forget()
+        # self.registration_frame.pack_forget()
         self.login_frame.pack(expand=True, fill='both')
 
     def start_gps(self):
@@ -177,6 +161,6 @@ class VirtualKeyboard(tk.Tk):
 
 
 if __name__ == "__main__":
-    app = VirtualKeyboard()
+    app = InterfazMain()
     app.protocol("WM_DELETE_WINDOW", app.on_closing)
     app.mainloop()

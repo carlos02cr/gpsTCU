@@ -3,7 +3,7 @@ import sqlite3
 # import bcrypt
 
 
-class RegistrationApp(tk.Toplevel):
+class InterfazRegistro(tk.Toplevel):
     def __init__(self, main_app):
         super().__init__()
         self.main_app = main_app  # Store the reference to the main window
@@ -135,25 +135,50 @@ class RegistrationApp(tk.Toplevel):
         self.main_app.return_to_main()
 
 
-def verificar_operador(nombre, password):
-    # create_database()
-    con = sqlite3.connect("operadores.db")
-    cursor = con.cursor()
-    cursor.execute("SELECT password FROM operadores" +
-                   f" WHERE username = '{nombre}'")
-    resultado = cursor.fetchone()
-    if resultado:
-        # hashed_password = resultado[0]
-        # bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-        if password == resultado[0]:
-            print("Usuario y contraseña correctos.")
-            return True
+class funcRegistro:
+    def __init__(self):
+        pass
+
+    def create_database(self):
+        # Conectar a la base de datos (se crea si no existe)
+        conn = sqlite3.connect("operadores.db")
+        cursor = conn.cursor()
+        # Crear tabla si no existe
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS operadores (
+                operator_id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+        conn.close()
+
+    def verificar_operador(self, interface, nombre, password):
+        # create_database()
+        con = sqlite3.connect("operadores.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT password FROM operadores" +
+                       f" WHERE username = '{nombre}'")
+        resultado = cursor.fetchone()
+        if resultado:
+            # hashed_password = resultado[0]
+            # bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            if password == resultado[0]:
+                interface.status_message.set("Usuario y contraseña correctos.")
+                print("Usuario y contraseña correctos.")
+                return True
+            else:
+                interface.status_login.set("Contraseña incorrecta.")
+                print("Contraseña incorrecta.")
+                return False
         else:
-            print("Contraseña incorrecta.")
+            interface.status_login.set("Usuario no encontrado.")
+            print("Usuario no encontrado.")
             return False
-    else:
-        print("Usuario no encontrado.")
-        return False
 
 
 if __name__ == "__main__":
