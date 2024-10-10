@@ -1,6 +1,6 @@
 import tkinter as tk
 import sqlite3
-import bcrypt
+# import bcrypt
 
 
 class RegistrationApp(tk.Toplevel):
@@ -154,13 +154,15 @@ class RegistrationApp(tk.Toplevel):
 
 
 def verificar_operador(nombre, password):
-    cursor = sqlite3.connect("operadores.db")
-    cursor.execute("SELECT password FROM operadores WHERE username =? ",
-                   (nombre))
+    con = sqlite3.connect("operadores.db")
+    cursor = con.cursor()
+    cursor.execute("SELECT password FROM operadores" +
+                   f" WHERE username = '{nombre}'")
     resultado = cursor.fetchone()
     if resultado:
-        hashed_password = resultado[0]
-        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+        # hashed_password = resultado[0]
+        # bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+        if password == resultado[0]:
             print("Usuario y contraseña correctos.")
             return True
         else:
@@ -172,5 +174,4 @@ def verificar_operador(nombre, password):
 
 
 if __name__ == "__main__":
-    app = RegistrationApp()
-    app.mainloop()
+    pass
