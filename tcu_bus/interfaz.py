@@ -1,5 +1,6 @@
 import tkinter as tk
 import threading
+import sqlite3
 from funcionesGPS import manejarGPS
 from registro import RegistrationApp, verificar_operador
 
@@ -17,7 +18,26 @@ class VirtualKeyboard(tk.Tk):
         self.gps_thread = None
         self.stop_event = threading.Event()
 
+        self.create_database()
         self.create_widgets()
+
+    def create_database(self):
+        # Conectar a la base de datos (se crea si no existe)
+        conn = sqlite3.connect("operadores.db")
+        cursor = conn.cursor()
+        # Crear tabla si no existe
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS operadores (
+                operator_id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+        conn.close()
 
     def create_widgets(self):
         # Crear un marco para el inicio de sesión

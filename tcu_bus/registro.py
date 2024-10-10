@@ -12,7 +12,7 @@ class RegistrationApp(tk.Toplevel):
         self.geometry("800x480")
 
         # Crear base de datos y tabla si no existe
-        self.create_database()
+        # create_database()
 
         # Variables para los campos de entrada
         self.operator_id = tk.StringVar()
@@ -26,24 +26,6 @@ class RegistrationApp(tk.Toplevel):
         # Crear widgets de la interfaz
         self.create_widgets()
         self.keyboard_frame = None  # Inicializar el teclado
-
-    def create_database(self):
-        # Conectar a la base de datos (se crea si no existe)
-        conn = sqlite3.connect("operadores.db")
-        cursor = conn.cursor()
-        # Crear tabla si no existe
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS operadores (
-                operator_id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL,
-                username TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        ''')
-        conn.commit()
-        conn.close()
 
     def create_widgets(self):
         # Usar grid para colocar los campos en 3 columnas y 2 filas
@@ -154,6 +136,7 @@ class RegistrationApp(tk.Toplevel):
 
 
 def verificar_operador(nombre, password):
+    # create_database()
     con = sqlite3.connect("operadores.db")
     cursor = con.cursor()
     cursor.execute("SELECT password FROM operadores" +
