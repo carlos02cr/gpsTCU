@@ -80,7 +80,7 @@ class InterfazMain(tk.Tk, funcRegistro):
 
         for index, key in enumerate(keys):
             button = tk.Button(
-                keyboard_frame, text=key, width=6,
+                keyboard_frame, text=key, width=5,
                 command=lambda k=key: self.key_press(k)
             )
             row, col = divmod(index, 10)
@@ -122,11 +122,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         registration_app.mainloop()
 
     def return_to_main(self):
-        self.deiconify()
-
-    def show_login(self):
-        # self.registration_frame.pack_forget()
-        self.login_frame.pack(expand=True, fill='both')
+        self.deiconify
 
     def start_gps(self):
         if self.gps_thread and self.gps_thread.is_alive():

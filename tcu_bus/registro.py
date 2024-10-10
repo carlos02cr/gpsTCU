@@ -3,6 +3,8 @@ import sqlite3
 import re
 # import bcrypt
 
+font = ("Helvetica", 12)
+
 
 class funcRegistro:
     def __init__(self):
@@ -90,6 +92,11 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
     def __init__(self, main_app):
         super().__init__()
         self.main_app = main_app  # Store the reference to the main window
+
+        self.attributes("-fullscreen", True)
+        self.bind("<Escape>", lambda event:
+                  self.attributes("-fullscreen", False))
+
         self.title("Registro de Operadores")
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
@@ -116,39 +123,41 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
             self.grid_columnconfigure(i, weight=1)
 
         # Usar grid para colocar los campos en 3 columnas y 2 filas
-        tk.Label(self, text="ID del Operador:").grid(
+        tk.Label(self, text="ID del Operador:", font=font).grid(
             row=0, column=0, padx=5, pady=7)
-        tk.Entry(self, textvariable=self.operator_id).grid(
+        tk.Entry(self, textvariable=self.operator_id, font=font).grid(
             row=0, column=1, padx=5, pady=7)
 
-        tk.Label(self, text="Nombre y Apellido:").grid(
+        tk.Label(self, text="Nombre y Apellido:", font=font).grid(
             row=0, column=2, padx=5, pady=7)
-        tk.Entry(self, textvariable=self.name).grid(
+        tk.Entry(self, textvariable=self.name, font=font).grid(
             row=0, column=3, padx=5, pady=7)
 
-        tk.Label(self, text="Teléfono:").grid(row=1, column=0, padx=5, pady=7)
-        tk.Entry(self, textvariable=self.phone).grid(
+        tk.Label(self, text="Teléfono:", font=font).grid(
+            row=1, column=0, padx=5, pady=7)
+        tk.Entry(self, textvariable=self.phone, font=font).grid(
             row=1, column=1, padx=5, pady=7)
 
-        tk.Label(self, text="Email:").grid(row=1, column=2, padx=5, pady=7)
-        tk.Entry(self, textvariable=self.email).grid(
+        tk.Label(self, text="Email:", font=font).grid(
+            row=1, column=2, padx=5, pady=7)
+        tk.Entry(self, textvariable=self.email, font=font).grid(
             row=1, column=3, padx=5, pady=7)
 
-        tk.Label(self, text="Nombre de usuario:").grid(
+        tk.Label(self, text="Nombre de usuario:", font=font).grid(
             row=2, column=0, padx=5, pady=7)
-        tk.Entry(self, textvariable=self.username).grid(
+        tk.Entry(self, textvariable=self.username, font=font).grid(
             row=2, column=1, padx=5, pady=7)
 
-        tk.Label(self, text="Contraseña:").grid(
+        tk.Label(self, text="Contraseña:", font=font).grid(
             row=2, column=2, padx=5, pady=7)
-        tk.Entry(self, textvariable=self.password,
+        tk.Entry(self, textvariable=self.password, font=font,
                  show="*").grid(row=2, column=3, padx=5, pady=7)
 
-        tk.Button(self, text="Registrar", command=self.register).grid(
-            row=3, column=1, columnspan=1, pady=10)
+        tk.Button(self, text="Registrar", command=self.register,
+                  font=font).grid(row=3, column=1, columnspan=1, pady=10)
 
-        tk.Button(self, text="Volver", command=self.volver).grid(
-            row=3, column=2, columnspan=1, pady=10)
+        tk.Button(self, text="Volver", command=self.volver,
+                  font=font).grid(row=3, column=2, columnspan=1, pady=10)
 
         self.create_keyboard()
 
@@ -170,10 +179,15 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
 
         for key in keys:
             button = tk.Button(self.keyboard_frame, text=key,
-                               width=5,
+                               width=5, font=font,
                                command=lambda k=key: self.key_press(k))
             row, col = divmod(keys.index(key), 10)
-            button.grid(row=row, column=col)
+
+            if key == 'BORRAR':
+                button.grid(row=row, column=col, columnspan=2, sticky="we")
+                button.config(width=10)  # Adjust the width as needed
+            else:
+                button.grid(row=row, column=col)
 
     def key_press(self, key):
         focused_widget = self.focus_get()
