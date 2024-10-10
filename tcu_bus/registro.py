@@ -1,5 +1,6 @@
 import tkinter as tk
 import sqlite3
+import re
 # import bcrypt
 
 
@@ -183,6 +184,20 @@ class funcRegistro:
             interface.status_login.set("Usuario no encontrado.")
             print("Usuario no encontrado.")
             return False
+
+    def verificarRegistro(self, operator_id, name,
+                          phone, email, username, password):
+        if not re.match("^[0-9]{8}$", phone):
+            raise ValueError("Número de teléfono inválido,"
+                             " deben ser 8 números.")
+
+        email_pattern = re.compile(
+            r"^[a-zA-Z0-9_.+-]+@"      # Parte local del email
+            r"[a-zA-Z0-9-]+\."         # Nombre del dominio
+            r"[a-zA-Z0-9-.]+$"         # Extensión
+        )
+        if not re.match(email_pattern, email):
+            raise ValueError("Correo electrónico inválido.")
 
 
 if __name__ == "__main__":
