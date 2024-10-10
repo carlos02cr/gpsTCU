@@ -3,6 +3,8 @@ import threading
 from funcionesGPS import manejarGPS
 from registro import InterfazRegistro, funcRegistro
 
+font = ("Helvetica", 12)
+
 
 class InterfazMain(tk.Tk, funcRegistro):
     def __init__(self):
@@ -10,7 +12,9 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.attributes("-fullscreen", True)
         self.bind("<Escape>", lambda event:
                   self.attributes("-fullscreen", False))
+
         self.title("INICIO DE SESION")
+
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
 
@@ -26,46 +30,58 @@ class InterfazMain(tk.Tk, funcRegistro):
     def create_widgets(self):
         # Crear un marco para el inicio de sesión
         self.login_frame = tk.Frame(self)
-        self.login_frame.pack(expand=True, fill='both')
+        self.login_frame.pack(fill='both')
 
-        tk.Label(self.login_frame, text="USUARIO:").pack(expand=True, pady=5)
-        tk.Entry(self.login_frame,
-                 textvariable=self.username).pack(expand=True, pady=5)
+        # Frame para entradas de usuario y contraseña
+        self.user_pass_frame = tk.Frame(self.login_frame)
+        self.user_pass_frame.pack(pady=20)
 
-        tk.Label(self.login_frame, text="CONTRASEÑA:").pack(pady=5)
-        tk.Entry(self.login_frame, textvariable=self.password,
-                 show="*").pack(pady=5)
+        tk.Label(self.user_pass_frame, text="USUARIO:",
+                 font=font).pack(side=tk.LEFT, padx=5)
+        tk.Entry(self.user_pass_frame, textvariable=self.username,
+                 font=font).pack(side=tk.LEFT, padx=5)
+
+        tk.Label(self.user_pass_frame, text="CONTRASEÑA:",
+                 font=font).pack(side=tk.LEFT, padx=5)
+        tk.Entry(self.user_pass_frame, textvariable=self.password,
+                 show="*", font=font).pack(side=tk.LEFT, padx=5)
+
+        # Frame para botones de registrar e iniciar
+        self.inic_reg_frame = tk.Frame(self.login_frame)
+        self.inic_reg_frame.pack(pady=5)
+
+        tk.Button(self.inic_reg_frame, text="INICIAR", font=font,
+                  command=self.send_data).pack(side=tk.LEFT, padx=80)
+        tk.Button(self.inic_reg_frame, text="REGISTRARSE", font=font,
+                  command=self.show_registration).pack(side=tk.LEFT, padx=80)
+
 
         # Label para mostrar mensajes de estado de inicio
         self.status_login = tk.StringVar()
         tk.Label(self.login_frame, textvariable=self.status_login,
-                 fg="red").pack(expand=True, pady=1)
+                 fg="red", font=font).pack(expand=True, pady=1)
 
         # Crear el teclado y almacenarlo en self.keyboard_frame
         self.keyboard_frame = tk.Frame(self.login_frame)
         self.keyboard_frame.pack(expand=True, pady=10)
-
         self.create_keyboard()
-
-        tk.Button(self.login_frame, text="INICIAR",
-                  command=self.send_data).pack(expand=True, pady=5)
-        tk.Button(self.login_frame, text="REGISTRARSE",
-                  command=self.show_registration).pack(expand=True, pady=5)
 
         # Crear un marco para la sección del viaje (inicialmente oculta)
         self.trip_frame = tk.Frame(self)
 
-        tk.Button(self.trip_frame, text="Iniciar Viaje",
-                  command=self.start_gps, width=20, height=3).pack(
-                      expand=True, pady=20)
-        tk.Button(self.trip_frame, text="Finalizar Viaje",
-                  command=self.stop_gps, width=20, height=3).pack(
-                      expand=True, pady=20)
+        # Se hacen botones que cambian de color
+        self.botonIniciar = tk.Button(self.trip_frame, text="Iniciar Viaje", font=font,
+                  command=self.start_gps, width=20, height=3)
+        self.botonIniciar.pack(pady=20)
+
+        self.botonFinalizar = tk.Button(self.trip_frame, text="Finalizar Viaje", font=font,
+                  command=self.stop_gps, width=20, height=3)
+        self.botonFinalizar.pack(pady=20)
 
         # Label para mostrar mensajes de estado
         self.status_message = tk.StringVar()
         tk.Label(self.trip_frame, textvariable=self.status_message,
-                 fg="green").pack(expand=True, pady=10)
+                 font=font, fg="green").pack(expand=True, pady=10)
 
     def create_keyboard(self):
         keys = [
@@ -80,11 +96,18 @@ class InterfazMain(tk.Tk, funcRegistro):
 
         for index, key in enumerate(keys):
             button = tk.Button(
-                keyboard_frame, text=key, width=5,
+                keyboard_frame, text=key, width=5, font=font,
                 command=lambda k=key: self.key_press(k)
             )
             row, col = divmod(index, 10)
-            button.grid(row=row, column=col, padx=2, pady=2)
+
+            # Check if the key is "BORRAR" and apply columnspan and width
+            if key == 'BORRAR':
+                button.grid(row=row, column=col, columnspan=2,
+                            sticky="we", padx=2, pady=2)
+                button.config(width=10)  # Adjust the width as needed
+            else:
+                button.grid(row=row, column=col, padx=2, pady=2)
 
     def key_press(self, key):
         focused_widget = self.focus_get()
@@ -122,9 +145,11 @@ class InterfazMain(tk.Tk, funcRegistro):
         registration_app.mainloop()
 
     def return_to_main(self):
-        self.deiconify
+        self.deiconify()
 
     def start_gps(self):
+        self.botonFinalizar.config(bg="gray")
+        self.botonIniciar.config(bg="green")
         if self.gps_thread and self.gps_thread.is_alive():
             print("La lectura de GPS ya está en progreso.")
             return
@@ -146,6 +171,8 @@ class InterfazMain(tk.Tk, funcRegistro):
         print("Lectura de GPS iniciada.")
 
     def stop_gps(self):
+        self.botonFinalizar.config(bg="red")
+        self.botonIniciar.config(bg="gray")
         if self.gps_thread and self.gps_thread.is_alive():
             # Señalar al hilo que se detenga
             self.stop_event.set()
@@ -154,6 +181,7 @@ class InterfazMain(tk.Tk, funcRegistro):
             self.status_message.set("Lectura de GPS finalizada.")
             print("Lectura de GPS finalizada.")
         else:
+            self.status_message.set("La lectura de GPS no está en ejecución.")
             print("La lectura de GPS no está en ejecución.")
 
     def on_closing(self):

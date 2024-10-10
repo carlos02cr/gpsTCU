@@ -101,9 +101,6 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
 
-        # Crear base de datos y tabla si no existe
-        # create_database()
-
         # Variables para los campos de entrada
         self.operator_id = tk.StringVar()
         self.name = tk.StringVar()
