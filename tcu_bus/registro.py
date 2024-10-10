@@ -170,7 +170,7 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
 
         for key in keys:
             button = tk.Button(self.keyboard_frame, text=key,
-                               width=8,
+                               width=5,
                                command=lambda k=key: self.key_press(k))
             row, col = divmod(keys.index(key), 10)
             button.grid(row=row, column=col)

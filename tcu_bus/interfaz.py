@@ -7,6 +7,9 @@ from registro import InterfazRegistro, funcRegistro
 class InterfazMain(tk.Tk, funcRegistro):
     def __init__(self):
         super().__init__()
+        self.attributes("-fullscreen", True)
+        self.bind("<Escape>", lambda event:
+                  self.attributes("-fullscreen", False))
         self.title("INICIO DE SESION")
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
@@ -25,8 +28,9 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.login_frame = tk.Frame(self)
         self.login_frame.pack(expand=True, fill='both')
 
-        tk.Label(self.login_frame, text="USUARIO:").pack(pady=5)
-        tk.Entry(self.login_frame, textvariable=self.username).pack(pady=5)
+        tk.Label(self.login_frame, text="USUARIO:").pack(expand=True, pady=5)
+        tk.Entry(self.login_frame,
+                 textvariable=self.username).pack(expand=True, pady=5)
 
         tk.Label(self.login_frame, text="CONTRASEÑA:").pack(pady=5)
         tk.Entry(self.login_frame, textvariable=self.password,
@@ -35,31 +39,33 @@ class InterfazMain(tk.Tk, funcRegistro):
         # Label para mostrar mensajes de estado de inicio
         self.status_login = tk.StringVar()
         tk.Label(self.login_frame, textvariable=self.status_login,
-                 fg="red").pack(pady=1)
+                 fg="red").pack(expand=True, pady=1)
 
         # Crear el teclado y almacenarlo en self.keyboard_frame
         self.keyboard_frame = tk.Frame(self.login_frame)
-        self.keyboard_frame.pack(pady=10)
+        self.keyboard_frame.pack(expand=True, pady=10)
 
         self.create_keyboard()
 
         tk.Button(self.login_frame, text="INICIAR",
-                  command=self.send_data).pack(pady=5)
+                  command=self.send_data).pack(expand=True, pady=5)
         tk.Button(self.login_frame, text="REGISTRARSE",
-                  command=self.show_registration).pack(pady=5)
+                  command=self.show_registration).pack(expand=True, pady=5)
 
         # Crear un marco para la sección del viaje (inicialmente oculta)
         self.trip_frame = tk.Frame(self)
 
         tk.Button(self.trip_frame, text="Iniciar Viaje",
-                  command=self.start_gps, width=20, height=3).pack(pady=20)
+                  command=self.start_gps, width=20, height=3).pack(
+                      expand=True, pady=20)
         tk.Button(self.trip_frame, text="Finalizar Viaje",
-                  command=self.stop_gps, width=20, height=3).pack(pady=20)
+                  command=self.stop_gps, width=20, height=3).pack(
+                      expand=True, pady=20)
 
         # Label para mostrar mensajes de estado
         self.status_message = tk.StringVar()
         tk.Label(self.trip_frame, textvariable=self.status_message,
-                 fg="green").pack(pady=10)
+                 fg="green").pack(expand=True, pady=10)
 
     def create_keyboard(self):
         keys = [
@@ -70,7 +76,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         ]
 
         keyboard_frame = tk.Frame(self.keyboard_frame)
-        keyboard_frame.pack(pady=20)
+        keyboard_frame.pack(expand=True, pady=20)
 
         for index, key in enumerate(keys):
             button = tk.Button(
