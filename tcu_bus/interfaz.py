@@ -112,8 +112,8 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.withdraw()
         # Pass the main window as an argument
         registration_app = InterfazRegistro(self)
-        registration_app.mainloop()
         registration_app.protocol("WM_DELETE_WINDOW", self.on_closing)
+        registration_app.mainloop()
 
     def return_to_main(self):
         self.deiconify()

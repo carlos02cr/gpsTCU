@@ -28,38 +28,42 @@ class InterfazRegistro(tk.Toplevel):
         self.keyboard_frame = None  # Inicializar el teclado
 
     def create_widgets(self):
+        # Hace que las columnas se expandan
+        for i in range(4):
+            self.grid_columnconfigure(i, weight=1)
+
         # Usar grid para colocar los campos en 3 columnas y 2 filas
         tk.Label(self, text="ID del Operador:").grid(
-            row=0, column=0, padx=5, pady=5)
+            row=0, column=0, padx=5, pady=7)
         tk.Entry(self, textvariable=self.operator_id).grid(
-            row=0, column=1, padx=5, pady=5)
+            row=0, column=1, padx=5, pady=7)
 
-        tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=5)
+        tk.Label(self, text="Nombre:").grid(row=0, column=2, padx=5, pady=7)
         tk.Entry(self, textvariable=self.name).grid(
-            row=0, column=3, padx=5, pady=5)
+            row=0, column=3, padx=5, pady=7)
 
-        tk.Label(self, text="Teléfono:").grid(row=1, column=0, padx=5, pady=5)
+        tk.Label(self, text="Teléfono:").grid(row=1, column=0, padx=5, pady=7)
         tk.Entry(self, textvariable=self.phone).grid(
-            row=1, column=1, padx=5, pady=5)
+            row=1, column=1, padx=5, pady=7)
 
-        tk.Label(self, text="Email:").grid(row=1, column=2, padx=5, pady=5)
+        tk.Label(self, text="Email:").grid(row=1, column=2, padx=5, pady=7)
         tk.Entry(self, textvariable=self.email).grid(
-            row=1, column=3, padx=5, pady=5)
+            row=1, column=3, padx=5, pady=7)
 
-        tk.Label(self, text="Usuario:").grid(row=2, column=0, padx=5, pady=5)
+        tk.Label(self, text="Usuario:").grid(row=2, column=0, padx=5, pady=7)
         tk.Entry(self, textvariable=self.username).grid(
-            row=2, column=1, padx=5, pady=5)
+            row=2, column=1, padx=5, pady=7)
 
         tk.Label(self, text="Contraseña:").grid(
-            row=2, column=2, padx=5, pady=5)
+            row=2, column=2, padx=5, pady=7)
         tk.Entry(self, textvariable=self.password,
-                 show="*").grid(row=2, column=3, padx=5, pady=5)
+                 show="*").grid(row=2, column=3, padx=5, pady=7)
 
         tk.Button(self, text="Registrar", command=self.register).grid(
-            row=3, column=0, columnspan=4, pady=10)
+            row=3, column=1, columnspan=1, pady=10)
 
         tk.Button(self, text="Volver", command=self.volver).grid(
-            row=3, column=1, columnspan=4, pady=10)
+            row=3, column=2, columnspan=1, pady=10)
 
         self.create_keyboard()
 
@@ -81,19 +85,19 @@ class InterfazRegistro(tk.Toplevel):
 
         for key in keys:
             button = tk.Button(self.keyboard_frame, text=key,
-                               width=5,
+                               width=8,
                                command=lambda k=key: self.key_press(k))
             row, col = divmod(keys.index(key), 10)
             button.grid(row=row, column=col)
 
     def key_press(self, key):
         focused_widget = self.focus_get()
-        if key == "BORRAR" and focused_widget:
-            current_text = focused_widget.get()
-            focused_widget.delete(0, tk.END)
-            focused_widget.insert(0, current_text[:-1])
-        else:
-            if focused_widget:
+        if isinstance(focused_widget, tk.Entry):
+            if key == "BORRAR":
+                current_text = focused_widget.get()
+                focused_widget.delete(0, tk.END)
+                focused_widget.insert(0, current_text[:-1])
+            else:
                 focused_widget.insert(tk.END, key)
 
     def register(self):
