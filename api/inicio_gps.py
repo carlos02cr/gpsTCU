@@ -17,7 +17,7 @@ try:
         line = ser.readline().decode('ascii', errors='replace').strip()  # Lee datos del puerto serial
         if line.startswith('$GPRMC'):                                    # Verifica si la línea comienza con $GPRMC
             print(line)                                                  # Muestra los datos en la consola
-            json_data = {f"gps_data{save_count}": line}                  # Estructura los datos en un diccionario para JSON
+            json_data = {f"dato_{save_count}": line}                  # Estructura los datos en un diccionario para JSON
             
             # Guardar en archivo JSON (sobrescribiendo)
             with open(json_output_file, 'w') as json_file:
@@ -25,7 +25,7 @@ try:
 
             # Guardar en archivo de texto (append)
             with open(txt_output_file, 'a') as txt_file:
-                txt_file.write(line + '\n')                              # Guarda la línea en el archivo de texto
+                txt_file.write(f"dato_{save_count}" + line + '\n')                              # Guarda la línea en el archivo de texto
 
             save_count += 1  # Incrementa el contador de guardados
 
