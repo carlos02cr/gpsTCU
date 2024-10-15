@@ -9,10 +9,31 @@ txt_output_file = 'gps_data.txt'    # Archivo de texto donde se guardarán los d
 api_url = 'https://realtime.bucr.digital/api/position'
 
 ser = serial.Serial(port, baudrate, timeout=10)  # Se abre puerto serial
-save_count = 1  # Contador de guardados
+save_count = 1                      # Contador de guardados
 with open(txt_output_file, 'w') as txt_file:
     txt_file.write("Iniciando nuevo registro de datos GPS\n")
 
+
+def revisar_validez(archivo_json):
+    with open(archivo_json,'r') as archivo:
+        datos = json.load(archivo)
+    
+        for alias,line in datos.items():
+            if line.startswith('$GPRMC'):  # Verificar si la línea comienza con $GPRMC
+                # Dividir el valor por comas para obtener los campos
+                campos = line.split(',')
+
+                # Revisar si el tercer campo es 'A' o 'V'
+                if len(campos) > 2:
+                    if campos[2] == 'A':
+                        return f"Línea válida (A)"
+                    elif campos[2] == 'V':
+                        return f"Línea inválida (V)"
+                else:
+                    return "Formato incorrecto, no se encontró el tercer campo."
+
+    return "No se encontró ninguna línea con $GPRMC."
+    
 try:
     print(f"Guardando datos en {json_output_file} y {txt_output_file}. Presione CTRL+C para salir.")
     while True:
@@ -25,6 +46,7 @@ try:
             with open(json_output_file, 'w') as json_file:
                 json.dump(json_data, json_file)                          # Escribe los datos en formato JSON en el archivo
 
+            revisar_validez(json_output_file)
             # Guardar en archivo de texto (append)
             with open(txt_output_file, 'a') as txt_file:
                 txt_file.write(f"dato_{save_count}: " + line + '\n')                              # Guarda la línea en el archivo de texto
