@@ -39,9 +39,6 @@ def conversion_latxlon(latitud, latitud_dir, longitud, longitud_dir):
     return lat_decimal, lon_decimal
     
 def enviar_api(latitud_decimal, longitud_decimal):
-    """
-    Recibe la latitud y longitud en grados decimales y envía los datos a la API.
-    """
     # Datos que se enviarán a la API
     data = {
         "journey_id": 698453,
@@ -77,7 +74,7 @@ try:
                     if lista[2] == 'A':                                                         # Si el elemento 3 es A (dato valido)
                         latxlon = lista[3:7]                                                    # Guardar elementos 4 al 8 [latitud,latitud_dir,longitud,longitud_dir]
                         latitud,longitud = conversion_latxlon(latxlon[0], latxlon[1], latxlon[2],latxlon[3])
-                        print(f"Linea completa: {line}\Latitud: {latitud}\nLongitud: {longitud}")
+                        print(f"Latitud: {latitud} y Longitud: {longitud}")
                         
                         with open(archivo_txt, 'a') as txt_file:
                             txt_file.write(f"{save_count}: Latitud: {latitud}, Longitud: {longitud} \n")                        # Guarda la línea en el archivo de texto
