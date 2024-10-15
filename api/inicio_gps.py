@@ -26,13 +26,17 @@ def revisar_validez(archivo_json):
                 # Revisar si el tercer campo es 'A' o 'V'
                 if len(campos) > 2:
                     if campos[2] == 'A':
-                        return f"Línea válida (A)"
+                        print(campos)
+                        print("Línea válida (A)")
+                        return 0
                     elif campos[2] == 'V':
-                        return f"Línea inválida (V)"
+                        print(campos)
+                        print("Línea inválida (V)")
+                        return 0
                 else:
-                    return "Formato incorrecto, no se encontró el tercer campo."
-
-    return "No se encontró ninguna línea con $GPRMC."
+                    print("Formato incorrecto, no se encontró el tercer campo.")
+                    return 0
+    return 0
     
 try:
     print(f"Guardando datos en {json_output_file} y {txt_output_file}. Presione CTRL+C para salir.")
