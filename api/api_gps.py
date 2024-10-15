@@ -5,12 +5,12 @@ import time
 # Configuración del puerto serial (ajusta el nombre del puerto según sea necesario)
 ser = serial.Serial('/dev/serial10', 9600, timeout=1)
 
-# URL de la API real o de prueba
-url = 'https://httpbin.org/post'  # Cambia esto por tu URL real cuando estés listo
+# URL de la API de prueba
+url = 'https://httpbin.org/post'  # Cambia esta URL por la API real cuando estés listo
 
 def parse_gprmc(data):
     """Parsea una línea GPRMC para extraer latitud y longitud."""
-    if data[0:6] == b'$GPRMC':
+    if data[0:6] == b'$GPRMC':  # Verifica si la línea es un mensaje GPRMC
         parts = data.decode('ascii').split(',')
         if parts[2] == 'A':  # Verifica si el mensaje es válido
             # Obtiene latitud
@@ -43,22 +43,26 @@ while True:
         if latitude and longitude:
             # Crea los datos para enviar
             data = {
-                "journey_id": 698453,
-                "timestamp": int(time.time()),
+                "journey_id": 698453,  # ID estático de un "viaje"
+                "timestamp": int(time.time()),  # Marca de tiempo en segundos desde 1970
                 "latitude": latitude,
                 "longitude": longitude,
-                "altitude": 0.0,
-                "speed": 0.0,
-                "bearing": 0.0,
-                "odometer": 0.0
+                "altitude": 0.0,  # Altitud (se puede cambiar si se obtiene del GPS)
+                "speed": 0.0,     # Velocidad (se puede cambiar si se obtiene del GPS)
+                "bearing": 0.0,   # Dirección (puede ser del GPS)
+                "odometer": 0.0   # Odometer (distancia recorrida)
             }
 
-            # Envía los datos a la API real o de prueba
+            # Mostrar los datos en la terminal antes de enviarlos
+            print(f"Datos que se enviarán: {data}")
+            
+            # Envía los datos a la API
             response = requests.post(url, json=data)
-            print(f"Enviando datos: {data}")
-            print(f"Respuesta de la API: {response.status_code}, {response.text}")
 
-        time.sleep(5)  # Envía datos cada 5 segundos
+            # Mostrar la respuesta de la API en la terminal
+            print(f"Respuesta de la API: {response.status_code}, {response.text}")
+        
+        time.sleep(5)  # Espera 5 segundos antes de enviar los próximos datos
 
     except Exception as e:
         print(f"Error: {e}")
