@@ -10,6 +10,8 @@ api_url = 'https://realtime.bucr.digital/api/position'
 
 ser = serial.Serial(port, baudrate, timeout=10)  # Se abre puerto serial
 save_count = 1  # Contador de guardados
+with open(txt_output_file, 'w') as txt_file:
+    txt_file.write("Iniciando nuevo registro de datos GPS\n")
 
 try:
     print(f"Guardando datos en {json_output_file} y {txt_output_file}. Presione CTRL+C para salir.")
@@ -25,7 +27,7 @@ try:
 
             # Guardar en archivo de texto (append)
             with open(txt_output_file, 'a') as txt_file:
-                txt_file.write(f"dato_{save_count}" + line + '\n')                              # Guarda la línea en el archivo de texto
+                txt_file.write(f"dato_{save_count}: " + line + '\n')                              # Guarda la línea en el archivo de texto
 
             save_count += 1  # Incrementa el contador de guardados
 
