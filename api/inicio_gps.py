@@ -46,7 +46,7 @@ try:
             with open(json_output_file, 'w') as json_file:
                 json.dump(json_data, json_file)                          # Escribe los datos en formato JSON en el archivo
 
-            revisar_validez(json_output_file)
+            print(revisar_validez(json_output_file))
             # Guardar en archivo de texto (append)
             with open(txt_output_file, 'a') as txt_file:
                 txt_file.write(f"dato_{save_count}: " + line + '\n')                              # Guarda la línea en el archivo de texto
