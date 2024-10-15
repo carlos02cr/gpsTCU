@@ -13,7 +13,7 @@ try:
         print(f"Guardando datos en {output_file}. Presione CTRL+C para salir.")
         while True:
             line = ser.readline().decode('ascii', errors='replace').strip()  # Lee datos del puerto serial
-            if line:
+            if line.startswith('$GPRMC'):  # Verifica si la línea comienza con $GPRMC
                 print(line)  # Muestra los datos en la consola
                 json_data = {"gps_data": line}  # Estructura los datos en un diccionario para JSON
                 json.dump(json_data, file)  # Escribe los datos en formato JSON en el archivo
