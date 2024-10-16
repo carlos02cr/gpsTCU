@@ -21,10 +21,10 @@ with open(archivo_csv, 'w', newline='') as csv_file:
 ser = serial.Serial(port, baudrate, timeout=10)             # Se abre puerto serial
 save_count = 1                                              # Contador de guardados
 
-def guardar_csv(nombre_archivo, latitud, longitud,hora):
+def guardar_csv(nombre_archivo, latitud, longitud):
     with open(nombre_archivo, mode='a', newline='') as archivo_csv: # Modo 'a' para agregar datos sin sobrescribir
         escritor_csv = csv.writer(archivo_csv)
-        escritor_csv.writerow([latitud, longitud,hora])                  # Escribir la fila con latitud y longitud
+        escritor_csv.writerow([latitud, longitud])                  # Escribir la fila con latitud y longitud
         
 def guardar_txt(nombre_archivo, latitud, longitud, save_count):
     with open(nombre_archivo, 'a') as txt_file:                     # Modo 'a' para agregar datos sin sobrescribir
