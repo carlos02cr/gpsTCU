@@ -127,7 +127,7 @@ class VirtualKeyboard(tk.Tk):
             return
 
         self.stop_event.clear()
-        self.gps_thread = threading.Thread(target=manejarGPS, args=(self.stop_event, self.process_gps_data), daemon=True)
+        self.gps_thread = threading.Thread(target=manejarGPS, daemon=True)
         self.gps_thread.start()
         self.status_message.set("Lectura de GPS iniciada.")
 
