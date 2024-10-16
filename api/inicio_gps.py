@@ -74,7 +74,7 @@ def enviar_api(latitud_decimal, longitud_decimal):
         print(f"Error de conexión al intentar enviar los datos: {e}")
  
 def utc_to_cst (lista):
-    hora_utc = lista
+    hora_utc = int(lista)
     horas = hora_utc[:2]
     minutos = hora_utc[2:4]
     segundos = hora_utc[4:6]
