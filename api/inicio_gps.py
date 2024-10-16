@@ -73,8 +73,7 @@ def enviar_api(latitud_decimal, longitud_decimal):
     except requests.exceptions.RequestException as e:
         print(f"Error de conexión al intentar enviar los datos: {e}")
  
-def utc_to_cst (lista):
-    hora_utc = lista
+def utc_to_cst (hora_utc):
     horas = hora_utc[:2]
     minutos = hora_utc[2:4]
     segundos = hora_utc[4:6]
@@ -94,10 +93,11 @@ try:
             lista = line.split(',')                                                             # Genera una lista de 13 elementos 
             if len(lista) > 2:                                                                  # Si la lista contiene mas de 2 elementos
                     if lista[2] == 'A':                                                         # Si el elemento 3 es A (dato valido)
-                        hora = utc_to_cst(float(lista[1]))
+                        hora = int(lista[1])
+                        horas = utc_to_cst(hora)
                         latxlon = lista[3:7]                                                    # Guardar elementos 4 al 8 [latitud,latitud_dir,longitud,longitud_dir]
                         latitud,longitud = conversion_latxlon(latxlon[0], latxlon[1], latxlon[2],latxlon[3])
-                        print(f"Hora: {hora}, Latitud: {latitud} y Longitud: {longitud}")
+                        print(f"Hora: {horas}, Latitud: {latitud} y Longitud: {longitud}")
                         
                         guardar_csv(archivo_csv, latitud, longitud, hora)
                         guardar_txt(archivo_txt, latitud, longitud, save_count)
