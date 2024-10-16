@@ -6,7 +6,7 @@ class RegistrationApp(tk.Toplevel):
         super().__init__(master)
         self.master = master
         self.title("Registro de Operadores")
-        self.geometry("800x480")
+        self.geometry("800x480")  # Dimensiones ajustadas a la pantalla de la Raspberry Pi
 
         # Variables para campos de entrada
         self.operator_id = tk.StringVar()
@@ -20,7 +20,7 @@ class RegistrationApp(tk.Toplevel):
         # Crear la base de datos y la tabla si no existen
         self.create_database()
 
-        # Crear el diseño de los campos en dos columnas
+        # Crear el diseño de los campos de entrada y el teclado
         self.create_widgets()
 
     def create_database(self):
@@ -44,60 +44,76 @@ class RegistrationApp(tk.Toplevel):
         conn.close()
 
     def create_widgets(self):
+        # Crear un contenedor para los campos de registro y teclado
         container_frame = tk.Frame(self)
-        container_frame.pack(expand=True)
+        container_frame.pack(expand=True, fill="both", padx=10, pady=10)
 
+        # Crear dos columnas para los campos de entrada
         left_frame = tk.Frame(container_frame)
-        left_frame.grid(row=0, column=0, padx=20, pady=10, sticky="n")
+        left_frame.grid(row=0, column=0, padx=10, pady=5, sticky="n")
 
         right_frame = tk.Frame(container_frame)
-        right_frame.grid(row=0, column=1, padx=20, pady=10, sticky="n")
+        right_frame.grid(row=0, column=1, padx=10, pady=5, sticky="n")
 
-        tk.Label(left_frame, text="ID Operador:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(left_frame, textvariable=self.operator_id).grid(row=0, column=1, padx=5, pady=5, sticky='we')
+        # Campos de la izquierda (ID, Nombre, Teléfono)
+        tk.Label(left_frame, text="ID Operador:", font=("Arial", 12)).grid(row=0, column=0, padx=5, pady=3, sticky='e')
+        tk.Entry(left_frame, textvariable=self.operator_id, font=("Arial", 12), width=20).grid(row=0, column=1, padx=5, pady=3)
 
-        tk.Label(left_frame, text="Nombre:").grid(row=1, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(left_frame, textvariable=self.name).grid(row=1, column=1, padx=5, pady=5, sticky='we')
+        tk.Label(left_frame, text="Nombre:", font=("Arial", 12)).grid(row=1, column=0, padx=5, pady=3, sticky='e')
+        tk.Entry(left_frame, textvariable=self.name, font=("Arial", 12), width=20).grid(row=1, column=1, padx=5, pady=3)
 
-        tk.Label(left_frame, text="Teléfono:").grid(row=2, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(left_frame, textvariable=self.phone).grid(row=2, column=1, padx=5, pady=5, sticky='we')
+        tk.Label(left_frame, text="Teléfono:", font=("Arial", 12)).grid(row=2, column=0, padx=5, pady=3, sticky='e')
+        tk.Entry(left_frame, textvariable=self.phone, font=("Arial", 12), width=20).grid(row=2, column=1, padx=5, pady=3)
 
-        tk.Label(right_frame, text="Email:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(right_frame, textvariable=self.email).grid(row=0, column=1, padx=5, pady=5, sticky='we')
+        # Campos de la derecha (Email, Usuario, Contraseña)
+        tk.Label(right_frame, text="Email:", font=("Arial", 12)).grid(row=0, column=0, padx=5, pady=3, sticky='e')
+        tk.Entry(right_frame, textvariable=self.email, font=("Arial", 12), width=20).grid(row=0, column=1, padx=5, pady=3)
 
-        tk.Label(right_frame, text="Usuario:").grid(row=1, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(right_frame, textvariable=self.register_username).grid(row=1, column=1, padx=5, pady=5, sticky='we')
+        tk.Label(right_frame, text="Usuario:", font=("Arial", 12)).grid(row=1, column=0, padx=5, pady=3, sticky='e')
+        tk.Entry(right_frame, textvariable=self.register_username, font=("Arial", 12), width=20).grid(row=1, column=1, padx=5, pady=3)
 
-        tk.Label(right_frame, text="Contraseña:").grid(row=2, column=0, padx=5, pady=5, sticky='e')
-        tk.Entry(right_frame, textvariable=self.register_password, show="*").grid(row=2, column=1, padx=5, pady=5, sticky='we')
+        tk.Label(right_frame, text="Contraseña:", font=("Arial", 12)).grid(row=2, column=0, padx=5, pady=3, sticky='e')
+        tk.Entry(right_frame, textvariable=self.register_password, show="*", font=("Arial", 12), width=20).grid(row=2, column=1, padx=5, pady=3)
 
-        tk.Button(container_frame, text="Registrar", command=self.register_user).grid(row=1, column=0, columnspan=2, pady=20)
-        tk.Button(container_frame, text="Volver al Login", command=self.close_window).grid(row=2, column=0, columnspan=2, pady=10)
+        # Botones de acción centrados bajo los campos
+        tk.Button(container_frame, text="Registrar", command=self.register_user, font=("Arial", 12), width=15).grid(row=1, column=0, columnspan=2, pady=2)
+        tk.Button(container_frame, text="Volver al Login", command=self.close_window, font=("Arial", 12), width=15).grid(row=2, column=0, columnspan=2, pady=2)
 
-        self.success_label = tk.Label(self, textvariable=self.registration_message, fg="green")
-        self.success_label.pack(pady=10)
+        # Mensaje de confirmación
+        self.success_label = tk.Label(container_frame, textvariable=self.registration_message, fg="green", font=("Arial", 12))
+        self.success_label.grid(row=3, column=0, columnspan=2, pady=2)
 
-        # Crear teclado virtual
-        self.keyboard_frame = tk.Frame(self)
-        self.keyboard_frame.pack(pady=20)
+        # Crear teclado virtual más compacto y centrado
+        self.keyboard_frame = tk.Frame(container_frame)
+        self.keyboard_frame.grid(row=4, column=0, columnspan=2, pady=5)
+
         self.create_keyboard()
 
     def create_keyboard(self):
-        keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-                'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
-                'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ',
-                'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BORRAR', 'ESPACIO', '@', '.']
+        # Teclas dispuestas como un teclado convencional
+        keys = [
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+            ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+            ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.', '@']
+        ]
 
         keyboard_frame = tk.Frame(self.keyboard_frame)
-        keyboard_frame.pack(pady=20)
+        keyboard_frame.pack(pady=5)
 
-        for index, key in enumerate(keys):
-            if key == 'ESPACIO':
-                button = tk.Button(keyboard_frame, text="Espacio", width=12, command=lambda k=' ': self.key_press(k))
-            else:
-                button = tk.Button(keyboard_frame, text=key, width=6, command=lambda k=key: self.key_press(k))
-            row, col = divmod(index, 10)
-            button.grid(row=row, column=col, padx=2, pady=2)
+        # Crear botón "BORRAR" que ocupe el lado derecho de la tercera y cuarta fila
+        button_borrar = tk.Button(keyboard_frame, text="<-", width=3, height=4, font=("Arial", 8), command=lambda k="BORRAR": self.key_press(k))
+        button_borrar.grid(row=2, column=9, rowspan=2, padx=1, pady=1)  # Botón en la tercera y cuarta fila, justo al lado de la "L" y "@"
+
+        # Colocar las teclas en la disposición correcta
+        for row_index, row in enumerate(keys):
+            for col_index, key in enumerate(row):
+                button = tk.Button(keyboard_frame, text=key, width=4, command=lambda k=key: self.key_press(k))
+                button.grid(row=row_index, column=col_index, padx=1, pady=1)
+
+        # Tecla "Espacio" larga en la última fila
+        button_space = tk.Button(keyboard_frame, text="Espacio", width=40, command=lambda k=' ': self.key_press(k))
+        button_space.grid(row=5, column=0, columnspan=11, padx=1, pady=1)
 
     def key_press(self, key):
         focused_widget = self.focus_get()
