@@ -9,13 +9,22 @@ archivo_txt = 'gps_data.txt'    # Archivo de texto donde se guardarán los datos
 archivo_csv = 'datos_gps.csv'
 api_url = 'https://realtime.bucr.digital/api/position'
 
+# Reiniciar el archivo de texto (sobrescribiendo)
+with open(archivo_txt, 'w') as txt_file:
+    txt_file.write("Iniciando nuevo registro de datos GPS\n")
+    
+# Reiniciar el archivo CSV (sobrescribiendo y añadiendo encabezados)
+with open(archivo_csv, 'w', newline='') as csv_file:
+    escritor_csv = csv.writer(csv_file)
+    escritor_csv.writerow(['Latitud', 'Longitud', 'Hora'])
+
 ser = serial.Serial(port, baudrate, timeout=10)             # Se abre puerto serial
 save_count = 1                                              # Contador de guardados
 
-def guardar_csv(nombre_archivo, latitud, longitud):
+def guardar_csv(nombre_archivo, latitud, longitud,hora):
     with open(nombre_archivo, mode='a', newline='') as archivo_csv: # Modo 'a' para agregar datos sin sobrescribir
         escritor_csv = csv.writer(archivo_csv)
-        escritor_csv.writerow([latitud, longitud])                  # Escribir la fila con latitud y longitud
+        escritor_csv.writerow([latitud, longitud,hora])                  # Escribir la fila con latitud y longitud
         
 def guardar_txt(nombre_archivo, latitud, longitud, save_count):
     with open(nombre_archivo, 'a') as txt_file:                     # Modo 'a' para agregar datos sin sobrescribir
@@ -63,7 +72,19 @@ def enviar_api(latitud_decimal, longitud_decimal):
             print(f"Error al enviar los datos a la API. Código de estado: {response.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"Error de conexión al intentar enviar los datos: {e}")
+ 
+def utc_to_cst (lista):
+    hora_utc = int(lista[1])
+    horas = hora_utc[:2]
+    minutos = hora_utc[2:4]
+    segundos = hora_utc[4:6]
+    if horas >= 6:
+        hora_cst = hora_utc - 6
+    else:
+        hora_cst = hora_utc + 18
+    return f"{hora_cst}:{minutos}:{segundos}"
     
+   
 try:
     print(f"Guardando datos en {archivo_csv} y {archivo_txt}. Presione CTRL+C para salir.")
     while True:
@@ -72,19 +93,17 @@ try:
             lista = line.split(',')                                                             # Genera una lista de 13 elementos 
             if len(lista) > 2:                                                                  # Si la lista contiene mas de 2 elementos
                     if lista[2] == 'A':                                                         # Si el elemento 3 es A (dato valido)
+                        hora = utc_to_cst(lista)
                         latxlon = lista[3:7]                                                    # Guardar elementos 4 al 8 [latitud,latitud_dir,longitud,longitud_dir]
                         latitud,longitud = conversion_latxlon(latxlon[0], latxlon[1], latxlon[2],latxlon[3])
-                        print(f"Latitud: {latitud} y Longitud: {longitud}")
+                        print(f"Hora: {hora}, Latitud: {latitud} y Longitud: {longitud}")
                         
-                        with open(archivo_txt, 'a') as txt_file:
-                            txt_file.write(f"{save_count}: Latitud: {latitud}, Longitud: {longitud} \n")                        # Guarda la línea en el archivo de texto
-                        
-                        guardar_csv(archivo_csv, latitud, longitud)
+                        guardar_csv(archivo_csv, latitud, longitud, hora)
                         guardar_txt(archivo_txt, latitud, longitud, save_count)
                         save_count += 1                                                         # Incrementa el contador de guardados
                         
                     elif lista[2] == 'V':
-                        print(f"Linea completa: {line}\nLista: None\nLínea inválida (V)")
+                        print(f"Se perdió conexión. Reconectando...")
                 
 except KeyboardInterrupt:
     print("\nPrograma interrumpido. Cerrando...")
