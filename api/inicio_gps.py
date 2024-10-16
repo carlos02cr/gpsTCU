@@ -82,7 +82,8 @@ def utc_to_cst (lista):
         hora_cst = hora_utc - 6
     else:
         hora_cst = hora_utc + 18
-    return f"{hora_cst}:{minutos}:{segundos}"
+    hora_final = str(hora_cst) + ':' + str(minutos) +':' + str(segundos)
+    return hora_final
     
    
 try:
