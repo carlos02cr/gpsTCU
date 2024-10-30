@@ -104,8 +104,21 @@ def manejarGPS(stop_event):
             f"{archivo_txt}. Presione CTRL+C para salir.")
         while not stop_event.is_set():
             if windows:
+                latitud = 1
+                longitud = 2
                 print("Proceso corriendo...")
                 time.sleep(0.5)
+                with open(archivo_txt, 'a') as txt_file:
+                    # Guarda la línea en el archivo de texto
+                    txt_file.write(
+                        f"{save_count}: Latitud: {latitud},"
+                        f" Longitud: {longitud} \n")
+
+                guardar_csv(archivo_csv, latitud, longitud)
+                guardar_txt(archivo_txt, latitud, longitud,
+                            save_count)
+                # Incrementa el contador de guardados
+                save_count += 1
             else:
                 line = ser.readline().decode('ascii', errors='replace').strip(
                 )  # Lee datos del puerto serial
