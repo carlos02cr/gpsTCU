@@ -51,7 +51,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.inic_reg_frame.pack(pady=5)
 
         tk.Button(self.inic_reg_frame, text="INICIAR", font=font,
-                  command=self.send_data).pack(side=tk.LEFT, padx=80)
+                  command=self.login).pack(side=tk.LEFT, padx=80)
         tk.Button(self.inic_reg_frame, text="REGISTRARSE", font=font,
                   command=self.show_registration).pack(side=tk.LEFT, padx=80)
 
@@ -78,6 +78,11 @@ class InterfazMain(tk.Tk, funcRegistro):
                                         font=font, command=self.stop_gps,
                                         width=20, height=3)
         self.botonFinalizar.pack(pady=20)
+
+        self.botonLogout = tk.Button(self.trip_frame, text="Cerrar sesión",
+                                     font=font, command=self.logout,
+                                     width=20, height=3)
+        self.botonLogout.pack(pady=20)
 
         # Label para mostrar mensajes de estado
         self.status_message = tk.StringVar()
@@ -120,7 +125,7 @@ class InterfazMain(tk.Tk, funcRegistro):
             else:
                 focused_widget.insert(tk.END, key)
 
-    def send_data(self):
+    def login(self):
 
         usuario = self.username.get()
         contraseña = self.password.get()
@@ -137,6 +142,12 @@ class InterfazMain(tk.Tk, funcRegistro):
             self.keyboard_frame.pack_forget()
         else:
             print("Error: Usuario o contraseña incorrectos.")
+
+    def logout(self):
+        # Ocultar el marco del viaje y mostrar el marco de inicio de sesión
+        self.trip_frame.pack_forget()
+        self.login_frame.pack(expand=True, fill='both')
+        self.keyboard_frame.pack(expand=True, fill='both')
 
     def show_registration(self):
         self.withdraw()
