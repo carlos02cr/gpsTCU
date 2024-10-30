@@ -55,7 +55,6 @@ class InterfazMain(tk.Tk, funcRegistro):
         tk.Button(self.inic_reg_frame, text="REGISTRARSE", font=font,
                   command=self.show_registration).pack(side=tk.LEFT, padx=80)
 
-
         # Label para mostrar mensajes de estado de inicio
         self.status_login = tk.StringVar()
         tk.Label(self.login_frame, textvariable=self.status_login,
@@ -70,12 +69,14 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.trip_frame = tk.Frame(self)
 
         # Se hacen botones que cambian de color
-        self.botonIniciar = tk.Button(self.trip_frame, text="Iniciar Viaje", font=font,
-                  command=self.start_gps, width=20, height=3)
+        self.botonIniciar = tk.Button(self.trip_frame, text="Iniciar Viaje",
+                                      font=font, command=self.start_gps,
+                                      width=20, height=3)
         self.botonIniciar.pack(pady=20)
 
-        self.botonFinalizar = tk.Button(self.trip_frame, text="Finalizar Viaje", font=font,
-                  command=self.stop_gps, width=20, height=3)
+        self.botonFinalizar = tk.Button(self.trip_frame, text="Parar Viaje",
+                                        font=font, command=self.stop_gps,
+                                        width=20, height=3)
         self.botonFinalizar.pack(pady=20)
 
         # Label para mostrar mensajes de estado
