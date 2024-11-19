@@ -2,6 +2,8 @@ import tkinter as tk
 import threading
 from funcionesGPS import manejarGPS
 from registro import InterfazRegistro, funcRegistro
+import sqlite3
+import requests
 
 font = ("Helvetica", 12)
 
@@ -125,14 +127,52 @@ class InterfazMain(tk.Tk, funcRegistro):
             else:
                 focused_widget.insert(tk.END, key)
 
+    def verificar_operador(self, usuario, contraseña):
+        conn = sqlite3.connect('operadores.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM operadores WHERE username = ? \
+                       AND password = ?", (usuario, contraseña))
+        # Si se encuentra un resultado, se devolverá una fila
+        operador = cursor.fetchone()
+        conn.close()
+
+        if operador:  # Si se encontró un operador
+            return operador  # Devuelve los datos del operador
+        return None
+
     def login(self):
 
         usuario = self.username.get()
         contraseña = self.password.get()
+        operador = self.verificar_operador(usuario, contraseña)
 
+        # Una vez se use solo el login con el API se debe quitar este IF
+        # y dejar solo el de operador.
         if self.verificarLogin(self, usuario, contraseña):
             print(f"Usuario: {usuario}")
             print(f"Contraseña: {contraseña}")
+
+            if operador:
+                # Si la verificación es exitosa, enviar los datos
+                # del operador a la API
+                data = {
+                    "operator_id": operador[0],
+                    "name": operador[1],
+                    "phone": operador[2],
+                    "email": operador[3]
+                }
+                try:
+                    response = requests.post(
+                        "https://realtime.bucr.digital/api/operator",
+                        json=data)
+                    print(response.status_code)
+                    if response.status_code == 200:
+                        print("Datos enviados exitosamente a la API.")
+                    else:
+                        print(f"Error al enviar \
+                              datos: {response.status_code} - {response.text}")
+                except requests.RequestException as e:
+                    print(f"Excepción al enviar datos a la API: {e}")
 
             # Ocultar el marco de inicio de sesión y mostrar el marco del viaje
             self.login_frame.pack_forget()
