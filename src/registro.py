@@ -12,7 +12,7 @@ class funcRegistro:
 
     def create_database(self):
         # Conectar a la base de datos (se crea si no existe)
-        conn = sqlite3.connect("operadores.db")
+        conn = sqlite3.connect("src/operadores.db")
         cursor = conn.cursor()
         # Crear tabla si no existe
         cursor.execute('''
@@ -30,7 +30,7 @@ class funcRegistro:
 
     def verificarLogin(self, interface, nombre, password):
         # create_database()
-        con = sqlite3.connect("operadores.db")
+        con = sqlite3.connect("src/operadores.db")
         cursor = con.cursor()
         cursor.execute("SELECT password FROM operadores" +
                        f" WHERE username = '{nombre}'")
@@ -168,7 +168,8 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
             'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
             'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ',
-            'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BORRAR']
+            'Z', 'X', 'C', 'V', 'B', 'N', 'M', '@', 'BORRAR'
+        ]
 
         self.keyboard_frame = tk.Frame(self)
         # Posiciona el teclado debajo de los campos
@@ -206,7 +207,7 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
         password = self.password.get()
 
         # Guardar en la base de datos
-        conn = sqlite3.connect("operadores.db")
+        conn = sqlite3.connect("src/operadores.db")
         cursor = conn.cursor()
         try:
             self.verificarRegistro(operator_id, name, phone,

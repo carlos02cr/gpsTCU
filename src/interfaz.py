@@ -128,7 +128,7 @@ class InterfazMain(tk.Tk, funcRegistro):
                 focused_widget.insert(tk.END, key)
 
     def verificar_operador(self, usuario, contraseña):
-        conn = sqlite3.connect('operadores.db')
+        conn = sqlite3.connect('src/operadores.db')
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM operadores WHERE username = ? \
                        AND password = ?", (usuario, contraseña))
