@@ -168,8 +168,11 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
             'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
             'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ',
-            'Z', 'X', 'C', 'V', 'B', 'N', 'M', '@', 'BORRAR'
+            'Z', 'X', 'C', 'V', 'B', 'N', 'M', '@', '.', '_',
+            'ESPACIO', 'BORRAR'
         ]
+
+        total_columns = 10
 
         self.keyboard_frame = tk.Frame(self)
         # Posiciona el teclado debajo de los campos
@@ -182,8 +185,12 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
             row, col = divmod(keys.index(key), 10)
 
             if key == 'BORRAR':
-                button.grid(row=row, column=col, columnspan=2, sticky="we")
+                button.grid(row=row, column=8, columnspan=2, sticky="we")
                 button.config(width=10)  # Adjust the width as needed
+            elif key == "ESPACIO":
+                space_row = len(keys) // total_columns
+                button.grid(row=space_row, column=0,
+                            columnspan=8, sticky="we")
             else:
                 button.grid(row=row, column=col)
 
@@ -194,6 +201,8 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
                 current_text = focused_widget.get()
                 focused_widget.delete(0, tk.END)
                 focused_widget.insert(0, current_text[:-1])
+            elif key == "ESPACIO":
+                focused_widget.insert(tk.END, " ")
             else:
                 focused_widget.insert(tk.END, key)
 

@@ -96,26 +96,34 @@ class InterfazMain(tk.Tk, funcRegistro):
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
             'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
             'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ',
-            'Z', 'X', 'C', 'V', 'B', 'N', 'M', '@', 'BORRAR'
+            'Z', 'X', 'C', 'V', 'B', 'N', 'M', '@', '.', '_',
+            'ESPACIO', 'BORRAR'
         ]
 
         keyboard_frame = tk.Frame(self.keyboard_frame)
         keyboard_frame.pack(expand=True, pady=20)
+
+        total_columns = 10  # Number of columns in the grid
 
         for index, key in enumerate(keys):
             button = tk.Button(
                 keyboard_frame, text=key, width=5, font=font,
                 command=lambda k=key: self.key_press(k)
             )
-            row, col = divmod(index, 10)
 
-            # Check if the key is "BORRAR" and apply columnspan and width
-            if key == 'BORRAR':
-                button.grid(row=row, column=col, columnspan=2,
-                            sticky="we", padx=2, pady=2)
-                button.config(width=10)  # Adjust the width as needed
-            else:
+            # Determine row and column for regular keys
+            if key != 'ESPACIO':
+                row, col = divmod(index, total_columns)
                 button.grid(row=row, column=col, padx=2, pady=2)
+
+                # Special handling for "BORRAR"
+                if key == 'BORRAR':
+                    button.config(width=10)
+                    button.grid(column=8, columnspan=2, sticky="we")
+            else:
+                # Para botón de espacio
+                button.grid(row=row + 1, column=0, columnspan=8,
+                            padx=2, pady=2, sticky="we")
 
     def key_press(self, key):
         focused_widget = self.focus_get()
@@ -124,6 +132,8 @@ class InterfazMain(tk.Tk, funcRegistro):
                 current_text = focused_widget.get()
                 focused_widget.delete(0, tk.END)
                 focused_widget.insert(0, current_text[:-1])
+            elif key == "ESPACIO":
+                focused_widget.insert(tk.END, " ")
             else:
                 focused_widget.insert(tk.END, key)
 
