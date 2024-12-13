@@ -4,12 +4,23 @@ import csv
 import os
 import time
 
+# Se detecta si el os es windows para simular 
+# la toma de datos (solo para pruebas fuera de la Raspberry)
 windows = False
 if os.name == 'nt':
     windows = True
 
 
 def guardar_csv(nombre_archivo, latitud, longitud):
+    """Se guardan datos enviados por módulo GPS en un archivo csv.
+
+    :param nombre_archivo: Nombre de archivo a escribir
+    :type nombre_archivo: string
+    :param latitud: Dato de latitud de posición
+    :type latitud: string
+    :param longitud: Dato de longitud de posición
+    :type longitud: string
+    """
     # Modo 'a' para agregar datos sin sobrescribir
     with open(nombre_archivo, mode='a', newline='') as archivo_csv:
         escritor_csv = csv.writer(archivo_csv)
@@ -18,6 +29,17 @@ def guardar_csv(nombre_archivo, latitud, longitud):
 
 
 def guardar_txt(nombre_archivo, latitud, longitud, save_count):
+    """Se guardan datos enviados por módulo GPS en un archivo txt.
+
+    :param nombre_archivo: Nombre de archivo a escribir
+    :type nombre_archivo: string
+    :param latitud: Dato de latitud de posición
+    :type latitud: string
+    :param longitud: Dato de longitud de posición
+    :type longitud: string
+    :param save_count: Número de cuenta
+    :type save_count: int
+    """
     # Modo 'a' para agregar datos sin sobrescribir
     with open(nombre_archivo, 'a') as txt_file:
         txt_file.write(
@@ -25,6 +47,20 @@ def guardar_txt(nombre_archivo, latitud, longitud, save_count):
 
 
 def conversion_latxlon(latitud, latitud_dir, longitud, longitud_dir):
+    """Se convierte la latitud y longitud de la forma en grados y minutos
+    a decimal, según hemisferio.
+
+    :param latitud: Dato de latitud conjunta
+    :type latitud: string
+    :param latitud_dir: Hemisferio de dato de latitud
+    :type latitud_dir: string
+    :param longitud: Dato de longitud conjunta
+    :type longitud: string
+    :param longitud_dir: Hemisferio de dato de longitud
+    :type longitud_dir: string
+    :return: Latitud y longitud en decimal
+    :rtype: tuple
+    """
     # Conversión de latitud (dos primeros dígitos son los grados)
     # Los primeros 2 caracteres son los grados para latitud
     lat_grados = int(latitud[:2])
@@ -51,6 +87,14 @@ def conversion_latxlon(latitud, latitud_dir, longitud, longitud_dir):
 
 
 def enviar_api(latitud_decimal, longitud_decimal):
+    """Se envían los datos de longitud al servidor por medio
+    de la API.
+
+    :param latitud_decimal: Latitud en forma decimal
+    :type latitud_decimal: string
+    :param longitud_decimal: Longitud en forma decimal
+    :type longitud_decimal: string
+    """
     # Datos que se enviarán a la API
     data = {
         "journey_id": 698453,
@@ -82,6 +126,11 @@ def enviar_api(latitud_decimal, longitud_decimal):
 
 
 def manejarGPS(stop_event):
+    """Función que maneja el rastreo de ubicación con el módulo GPS.
+
+    :param stop_event: Bandera para indicar cuando se debe detener el proceso
+    :type stop_event: threading.Event
+    """
     # Configuración puerto serial
     port = '/dev/serial0'               # Se define puerto
     baudrate = 9600                     # Frecuencia/velocidad de trabajo

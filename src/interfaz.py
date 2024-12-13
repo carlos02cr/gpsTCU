@@ -5,12 +5,25 @@ from registro import InterfazRegistro, funcRegistro
 import sqlite3
 import requests
 
+# Fuente determinada del sistema
 font = ("Helvetica", 12)
 
 
 class InterfazMain(tk.Tk, funcRegistro):
+    """Clase para la generación de la interfaz principal.
+
+
+    :param tk: Clase para interfaces con Tkinter
+    :type tk: Objeto Tk
+    :param funcRegistro: Clase con funciones/interfaz de registro
+    :type funcRegistro: Objeto funcRegistro
+    """
     def __init__(self):
+        """Función inicializadora de la interfaz principal.
+        """
         super().__init__()
+
+        # Inicia en fullscreen, para salir se usa Esc
         self.attributes("-fullscreen", True)
         self.bind("<Escape>", lambda event:
                   self.attributes("-fullscreen", False))
@@ -20,6 +33,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
 
+        # Variables internas de nombre de usuario/contraseña
         self.username = tk.StringVar()
         self.password = tk.StringVar()
 
@@ -30,6 +44,10 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.create_widgets()
 
     def create_widgets(self):
+        """Crea los objetos de las ventanas de inicio de sesión y
+        de control de viaje como lo son los botones y entradas de
+        credenciales.
+        """
         # Crear un marco para el inicio de sesión
         self.login_frame = tk.Frame(self)
         self.login_frame.pack(fill='both')
@@ -67,6 +85,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.keyboard_frame.pack(expand=True, pady=10)
         self.create_keyboard()
 
+
         # Crear un marco para la sección del viaje (inicialmente oculta)
         self.trip_frame = tk.Frame(self)
 
@@ -92,6 +111,10 @@ class InterfazMain(tk.Tk, funcRegistro):
                  font=font, fg="green").pack(expand=True, pady=10)
 
     def create_keyboard(self):
+        """Crear el teclado táctil en la pantalla de inicio de sesión.
+        """
+
+        # Caracteres del teclado
         keys = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
             'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
@@ -103,7 +126,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         keyboard_frame = tk.Frame(self.keyboard_frame)
         keyboard_frame.pack(expand=True, pady=20)
 
-        total_columns = 10  # Number of columns in the grid
+        total_columns = 10
 
         for index, key in enumerate(keys):
             button = tk.Button(
@@ -111,12 +134,13 @@ class InterfazMain(tk.Tk, funcRegistro):
                 command=lambda k=key: self.key_press(k)
             )
 
-            # Determine row and column for regular keys
+            # Se dimensiona de forma distinta la tecla según
+            # si es caracter, espacio o tecla de borrado.
             if key != 'ESPACIO':
                 row, col = divmod(index, total_columns)
                 button.grid(row=row, column=col, padx=2, pady=2)
 
-                # Special handling for "BORRAR"
+                # Para botón de borrado
                 if key == 'BORRAR':
                     button.config(width=10)
                     button.grid(column=8, columnspan=2, sticky="we")
@@ -126,7 +150,16 @@ class InterfazMain(tk.Tk, funcRegistro):
                             padx=2, pady=2, sticky="we")
 
     def key_press(self, key):
+        """Simula el efecto de presionar la tecla seleccionada.
+
+        :param key: Tecla presionada en teclado táctil.
+        :type key: tk.button
+        """
+
+        # Se detecta la ventana seleccionada
         focused_widget = self.focus_get()
+
+        # Se genera el comportamiento correspondiente a la tecla.
         if isinstance(focused_widget, tk.Entry):
             if key == "BORRAR":
                 current_text = focused_widget.get()
@@ -138,12 +171,33 @@ class InterfazMain(tk.Tk, funcRegistro):
                 focused_widget.insert(tk.END, key)
 
     def verificar_operador(self, usuario, contraseña):
+        """Verifica las credenciales ingresadas para el inicio de sesión.
+        Se verifica con base de datos local "operadores.db". Se debe modificar
+        una vez esté el servidor activo.
+
+        :param usuario: Nombre de usuario ingresado.
+        :type usuario: tk.StringVar
+        :param contraseña: Contraseña ingresada.
+        :type contraseña: tk.StringVar
+        :return: Booleano indicando si credenciales son válidos.
+        :rtype: Bool
+        """
+
+        # Se lee la base de datos local.
         conn = sqlite3.connect('src/operadores.db')
         cursor = conn.cursor()
+
+        # Se busca el conjunto de nombre de usuario y contraseña
         cursor.execute("SELECT * FROM operadores WHERE username = ? \
                        AND password = ?", (usuario, contraseña))
+        
         # Si se encuentra un resultado, se devolverá una fila
         operador = cursor.fetchone()
+
+        # Se imprime mensaje de error si es necesario
+        if not operador:
+            self.status_login.set("Usuario y/o contraseña inválidos.")
+
         conn.close()
 
         if operador:  # Si se encontró un operador
@@ -151,38 +205,38 @@ class InterfazMain(tk.Tk, funcRegistro):
         return None
 
     def login(self):
-
+        """Se intenta el login con las credenciales ingresadas.
+        Se verifica con la API/base de datos local, si es correcto
+        se pasa a interfaz de control de viaje. Sino se muestra mensaje
+        de error.
+        """
         usuario = self.username.get()
         contraseña = self.password.get()
         operador = self.verificar_operador(usuario, contraseña)
 
         # Una vez se use solo el login con el API se debe quitar este IF
         # y dejar solo el de operador.
-        if self.verificarLogin(self, usuario, contraseña):
-            print(f"Usuario: {usuario}")
-            print(f"Contraseña: {contraseña}")
-
-            if operador:
-                # Si la verificación es exitosa, enviar los datos
-                # del operador a la API
-                data = {
-                    "operator_id": operador[0],
-                    "name": operador[1],
-                    "phone": operador[2],
-                    "email": operador[3]
-                }
-                try:
-                    response = requests.post(
-                        "https://realtime.bucr.digital/api/operator",
-                        json=data)
-                    print(response.status_code)
-                    if response.status_code == 200:
-                        print("Datos enviados exitosamente a la API.")
-                    else:
-                        print(f"Error al enviar \
-                              datos: {response.status_code} - {response.text}")
-                except requests.RequestException as e:
-                    print(f"Excepción al enviar datos a la API: {e}")
+        if operador:
+            # Si la verificación es exitosa, enviar los datos
+            # del operador a la API
+            data = {
+                "operator_id": operador[0],
+                "name": operador[1],
+                "phone": operador[2],
+                "email": operador[3]
+            }
+            try:
+                response = requests.post(
+                    "https://realtime.bucr.digital/api/operator",
+                    json=data)
+                print(response.status_code)
+                if response.status_code == 200:
+                    print("Datos enviados exitosamente a la API.")
+                else:
+                    print(f"Error al enviar \
+                            datos: {response.status_code} - {response.text}")
+            except requests.RequestException as e:
+                print(f"Excepción al enviar datos a la API: {e}")
 
             # Ocultar el marco de inicio de sesión y mostrar el marco del viaje
             self.login_frame.pack_forget()
@@ -190,16 +244,18 @@ class InterfazMain(tk.Tk, funcRegistro):
 
             # Ocultar el teclado después del inicio de sesión
             self.keyboard_frame.pack_forget()
-        else:
-            print("Error: Usuario o contraseña incorrectos.")
 
     def logout(self):
+        """Retorna a interfaz de login desde la interfaz de control de viaje.
+        """
         # Ocultar el marco del viaje y mostrar el marco de inicio de sesión
         self.trip_frame.pack_forget()
         self.login_frame.pack(expand=True, fill='both')
         self.keyboard_frame.pack(expand=True, fill='both')
 
     def show_registration(self):
+        """Cambia a la interfaz de registro.
+        """
         self.withdraw()
         # Pass the main window as an argument
         registration_app = InterfazRegistro(self)
@@ -207,11 +263,21 @@ class InterfazMain(tk.Tk, funcRegistro):
         registration_app.mainloop()
 
     def return_to_main(self):
+        """Retorna a interfaz de inicio de sesión de la interfaz de 
+        registro.
+        """
         self.deiconify()
 
     def start_gps(self):
+        """Inicia la captura de datos por medio de función de
+        maejarGPS. Cambia el color de botones de control.
+        """
+
+        # Cambia botones de color
         self.botonFinalizar.config(bg="gray")
         self.botonIniciar.config(bg="green")
+
+        # Si ya se encuentra iniciado se notifica
         if self.gps_thread and self.gps_thread.is_alive():
             print("La lectura de GPS ya está en progreso.")
             return
@@ -233,20 +299,29 @@ class InterfazMain(tk.Tk, funcRegistro):
         print("Lectura de GPS iniciada.")
 
     def stop_gps(self):
+        """Finaliza la captura de datos por medio de función de
+        maejarGPS. Cambia el color de botones de control.
+        """
+
+        # Cambia color de botones de control
         self.botonFinalizar.config(bg="red")
         self.botonIniciar.config(bg="gray")
+
+        # Si el viaje se encuentra activo
         if self.gps_thread and self.gps_thread.is_alive():
-            # Señalar al hilo que se detenga
-            self.stop_event.set()
-            self.gps_thread.join()  # Esperar a que el hilo termine
+            self.stop_event.set() # Señalar al hilo que se detenga
+            self.gps_thread.join() # Esperar a que el hilo termine
+
             # Actualizar el mensaje de estado
             self.status_message.set("Lectura de GPS finalizada.")
-            print("Lectura de GPS finalizada.")
+
+        # Si viaje ya estaba finalizado
         else:
             self.status_message.set("La lectura de GPS no está en ejecución.")
-            print("La lectura de GPS no está en ejecución.")
 
     def on_closing(self):
+        """Finaliza el programa correctamente.
+        """
         # Asegurarse de que el hilo de GPS se detenga antes de cerrar
         self.stop_gps()
         self.destroy()

@@ -1,16 +1,24 @@
 import tkinter as tk
 import sqlite3
 import re
-# import bcrypt
 
+# Fuente determinada del sistema
 font = ("Helvetica", 12)
 
 
 class funcRegistro:
+    """Clase para generación de interfaz de registro.
+    """
+
     def __init__(self):
+        """Inicializador vacío.
+        """
         pass
 
     def create_database(self):
+        """Se crea el objeto database en caso de no existir.
+        """
+
         # Conectar a la base de datos (se crea si no existe)
         conn = sqlite3.connect("src/operadores.db")
         cursor = conn.cursor()
@@ -28,31 +36,25 @@ class funcRegistro:
         conn.commit()
         conn.close()
 
-    def verificarLogin(self, interface, nombre, password):
-        # create_database()
-        con = sqlite3.connect("src/operadores.db")
-        cursor = con.cursor()
-        cursor.execute("SELECT password FROM operadores" +
-                       f" WHERE username = '{nombre}'")
-        resultado = cursor.fetchone()
-        if resultado:
-            # hashed_password = resultado[0]
-            # bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-            if password == resultado[0]:
-                interface.status_message.set("Usuario y contraseña correctos.")
-                print("Usuario y contraseña correctos.")
-                return True
-            else:
-                interface.status_login.set("Contraseña incorrecta.")
-                print("Contraseña incorrecta.")
-                return False
-        else:
-            interface.status_login.set("Usuario no encontrado.")
-            print("Usuario no encontrado.")
-            return False
-
     def verificarRegistro(self, operator_id, name,
                           phone, email, username, password):
+        """Se verifica la validez de los datos de registro.
+
+        :param operator_id: ID de operador ingresada.
+        :type operator_id: tk.StringVar
+        :param name: Nombre completo ingresado.
+        :type name: tk.StringVar
+        :param phone: Número de teléfono ingresado.
+        :type phone: tk.StringVar
+        :param email: Email ingresado
+        :type email: tk.StringVar
+        :param username: Nombre de usuario ingresado
+        :type username: tk.StringVar
+        :param password: Contraseña ingresada.
+        :type password: tk.StringVar
+        :raises ValueError: Si los datos ingresados no cumplen con
+                            los requisitos dados.
+        """
 
         if not re.match("^[0-9]{1,8}$", operator_id):
             raise ValueError("ID inválido, debe ser "
@@ -89,15 +91,27 @@ class funcRegistro:
 
 
 class InterfazRegistro(tk.Toplevel, funcRegistro):
+    """Objeto que maneja interfaz de registro.
+
+    :param tk: Objeto de interfaces tk
+    :type tk: tk.Frame
+    :param funcRegistro: Clase con las funciones de registro.
+    :type funcRegistro: Clase funcRegistro
+    """
     def __init__(self, main_app):
         super().__init__()
-        self.main_app = main_app  # Store the reference to the main window
 
+        # Se guarda una referencia a la interfaz de inicio de
+        # sesión
+        self.main_app = main_app
+
+        # Inicia en fullscreen, para salir se usa Esc
         self.attributes("-fullscreen", True)
         self.bind("<Escape>", lambda event:
                   self.attributes("-fullscreen", False))
 
         self.title("Registro de Operadores")
+
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
 
@@ -164,6 +178,9 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
         self.success_label.grid(row=4, column=0, columnspan=4)
 
     def create_keyboard(self):
+        """Crear el teclado táctil en la pantalla de inicio de registro.
+        """
+
         keys = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
             'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
@@ -174,10 +191,12 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
 
         total_columns = 10
 
-        self.keyboard_frame = tk.Frame(self)
         # Posiciona el teclado debajo de los campos
+        self.keyboard_frame = tk.Frame(self)
         self.keyboard_frame.grid(row=5, column=0, columnspan=4, pady=20)
 
+        # Se dimensiona de forma distinta la tecla según
+        # si es caracter, espacio o tecla de borrado.
         for key in keys:
             button = tk.Button(self.keyboard_frame, text=key,
                                width=5, font=font,
@@ -186,7 +205,7 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
 
             if key == 'BORRAR':
                 button.grid(row=row, column=8, columnspan=2, sticky="we")
-                button.config(width=10)  # Adjust the width as needed
+                button.config(width=10)
             elif key == "ESPACIO":
                 space_row = len(keys) // total_columns
                 button.grid(row=space_row, column=0,
@@ -195,7 +214,16 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
                 button.grid(row=row, column=col)
 
     def key_press(self, key):
+        """Simula el efecto de presionar la tecla seleccionada.
+
+        :param key: Tecla presionada en teclado táctil.
+        :type key: tk.button
+        """
+
+        # Se detecta la ventana seleccionada
         focused_widget = self.focus_get()
+
+        # Se genera el comportamiento correspondiente a la tecla.
         if isinstance(focused_widget, tk.Entry):
             if key == "BORRAR":
                 current_text = focused_widget.get()
@@ -207,6 +235,8 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
                 focused_widget.insert(tk.END, key)
 
     def register(self):
+        """Se realiza registro de datos ingresados, si estos son válidos.
+        """
         # Obtener los datos de los campos
         operator_id = self.operator_id.get()
         name = self.name.get()
@@ -249,6 +279,8 @@ class InterfazRegistro(tk.Toplevel, funcRegistro):
             conn.close()
 
     def volver(self):
+        """Retorna a interfaz de inicio de sesión.
+        """
         self.destroy()  # Close the registration window
         self.main_app.return_to_main()
 
