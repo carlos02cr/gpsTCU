@@ -85,7 +85,6 @@ class InterfazMain(tk.Tk, funcRegistro):
         self.keyboard_frame.pack(expand=True, pady=10)
         self.create_keyboard()
 
-
         # Crear un marco para la sección del viaje (inicialmente oculta)
         self.trip_frame = tk.Frame(self)
 
@@ -190,7 +189,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         # Se busca el conjunto de nombre de usuario y contraseña
         cursor.execute("SELECT * FROM operadores WHERE username = ? \
                        AND password = ?", (usuario, contraseña))
-        
+
         # Si se encuentra un resultado, se devolverá una fila
         operador = cursor.fetchone()
 
@@ -247,7 +246,11 @@ class InterfazMain(tk.Tk, funcRegistro):
 
     def logout(self):
         """Retorna a interfaz de login desde la interfaz de control de viaje.
+        Llama función para finalizar el viaje.
         """
+        # Finalizar el viaje
+        self.stop_gps()
+
         # Ocultar el marco del viaje y mostrar el marco de inicio de sesión
         self.trip_frame.pack_forget()
         self.login_frame.pack(expand=True, fill='both')
@@ -263,7 +266,7 @@ class InterfazMain(tk.Tk, funcRegistro):
         registration_app.mainloop()
 
     def return_to_main(self):
-        """Retorna a interfaz de inicio de sesión de la interfaz de 
+        """Retorna a interfaz de inicio de sesión de la interfaz de
         registro.
         """
         self.deiconify()
@@ -309,8 +312,8 @@ class InterfazMain(tk.Tk, funcRegistro):
 
         # Si el viaje se encuentra activo
         if self.gps_thread and self.gps_thread.is_alive():
-            self.stop_event.set() # Señalar al hilo que se detenga
-            self.gps_thread.join() # Esperar a que el hilo termine
+            self.stop_event.set()  # Señalar al hilo que se detenga
+            self.gps_thread.join()  # Esperar a que el hilo termine
 
             # Actualizar el mensaje de estado
             self.status_message.set("Lectura de GPS finalizada.")

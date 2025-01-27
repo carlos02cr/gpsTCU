@@ -4,7 +4,7 @@ import csv
 import os
 import time
 
-# Se detecta si el os es windows para simular 
+# Se detecta si el os es windows para simular
 # la toma de datos (solo para pruebas fuera de la Raspberry)
 windows = False
 if os.name == 'nt':
