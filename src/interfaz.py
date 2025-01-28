@@ -33,6 +33,9 @@ class InterfazMain(tk.Tk, funcRegistro):
         # Ajustar a las dimensiones de la pantalla táctil
         self.geometry("800x480")
 
+        self.configure(bg="lightblue")  # Fondo de color azul claro
+
+
         # Variables internas de nombre de usuario/contraseña
         self.username = tk.StringVar()
         self.password = tk.StringVar()
@@ -49,30 +52,30 @@ class InterfazMain(tk.Tk, funcRegistro):
         credenciales.
         """
         # Crear un marco para el inicio de sesión
-        self.login_frame = tk.Frame(self)
+        self.login_frame = tk.Frame(self, bg="lightblue")
         self.login_frame.pack(fill='both')
 
         # Frame para entradas de usuario y contraseña
-        self.user_pass_frame = tk.Frame(self.login_frame)
+        self.user_pass_frame = tk.Frame(self.login_frame, bg="lightblue")
         self.user_pass_frame.pack(pady=20)
 
-        tk.Label(self.user_pass_frame, text="USUARIO:",
+        tk.Label(self.user_pass_frame, text="USUARIO:", bg="yellow",
                  font=font).pack(side=tk.LEFT, padx=5)
         tk.Entry(self.user_pass_frame, textvariable=self.username,
                  font=font).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(self.user_pass_frame, text="CONTRASEÑA:",
+        tk.Label(self.user_pass_frame, text="CONTRASEÑA:", bg="yellow",
                  font=font).pack(side=tk.LEFT, padx=5)
         tk.Entry(self.user_pass_frame, textvariable=self.password,
                  show="*", font=font).pack(side=tk.LEFT, padx=5)
 
         # Frame para botones de registrar e iniciar
-        self.inic_reg_frame = tk.Frame(self.login_frame)
+        self.inic_reg_frame = tk.Frame(self.login_frame, bg="lightblue")
         self.inic_reg_frame.pack(pady=5)
 
-        tk.Button(self.inic_reg_frame, text="INICIAR", font=font,
+        tk.Button(self.inic_reg_frame, text="INICIAR", bg="lightgreen", fg="black", font=font,
                   command=self.login).pack(side=tk.LEFT, padx=80)
-        tk.Button(self.inic_reg_frame, text="REGISTRARSE", font=font,
+        tk.Button(self.inic_reg_frame, text="REGISTRARSE", bg="lightgreen", fg="black", font=font,
                   command=self.show_registration).pack(side=tk.LEFT, padx=80)
 
         # Label para mostrar mensajes de estado de inicio
@@ -81,25 +84,25 @@ class InterfazMain(tk.Tk, funcRegistro):
                  fg="red", font=font).pack(expand=True, pady=1)
 
         # Crear el teclado y almacenarlo en self.keyboard_frame
-        self.keyboard_frame = tk.Frame(self.login_frame)
+        self.keyboard_frame = tk.Frame(self.login_frame, bg="lightblue")
         self.keyboard_frame.pack(expand=True, pady=10)
         self.create_keyboard()
 
         # Crear un marco para la sección del viaje (inicialmente oculta)
-        self.trip_frame = tk.Frame(self)
+        self.trip_frame = tk.Frame(self, bg="lightblue")
 
         # Se hacen botones que cambian de color
-        self.botonIniciar = tk.Button(self.trip_frame, text="Iniciar Viaje",
+        self.botonIniciar = tk.Button(self.trip_frame, text="Iniciar Viaje", bg="lightgreen", fg="black",
                                       font=font, command=self.start_gps,
                                       width=20, height=3)
         self.botonIniciar.pack(pady=20)
 
-        self.botonFinalizar = tk.Button(self.trip_frame, text="Parar Viaje",
+        self.botonFinalizar = tk.Button(self.trip_frame, text="Parar Viaje", bg="yellow", fg="black",
                                         font=font, command=self.stop_gps,
                                         width=20, height=3)
         self.botonFinalizar.pack(pady=20)
 
-        self.botonLogout = tk.Button(self.trip_frame, text="Cerrar sesión",
+        self.botonLogout = tk.Button(self.trip_frame, text="Cerrar sesión", bg="red", fg="black",
                                      font=font, command=self.logout,
                                      width=20, height=3)
         self.botonLogout.pack(pady=20)
@@ -122,29 +125,45 @@ class InterfazMain(tk.Tk, funcRegistro):
             'ESPACIO', 'BORRAR'
         ]
 
-        keyboard_frame = tk.Frame(self.keyboard_frame)
+        keyboard_frame = tk.Frame(self.keyboard_frame, bg="lightblue")
         keyboard_frame.pack(expand=True, pady=20)
 
         total_columns = 10
 
         for index, key in enumerate(keys):
+            # Colores predeterminados
+            if key == 'ESPACIO':
+                bg_color = "lightgray"
+                fg_color = "black"
+            elif key == 'BORRAR':
+                bg_color = "red"
+                fg_color = "white"
+            else:
+                bg_color = "black"
+                fg_color = "white"
+
+            # Crear el botón con los colores aplicados
             button = tk.Button(
-                keyboard_frame, text=key, width=5, font=font,
+                keyboard_frame,
+                text=key,
+                width=5,
+                font=font,
+                bg=bg_color,  # Color de fondo
+                fg=fg_color,  # Color del texto
                 command=lambda k=key: self.key_press(k)
             )
 
-            # Se dimensiona de forma distinta la tecla según
-            # si es caracter, espacio o tecla de borrado.
+            # Colocar el botón en la cuadrícula
             if key != 'ESPACIO':
                 row, col = divmod(index, total_columns)
                 button.grid(row=row, column=col, padx=2, pady=2)
 
-                # Para botón de borrado
+                # Ajustar botón BORRAR
                 if key == 'BORRAR':
                     button.config(width=10)
                     button.grid(column=8, columnspan=2, sticky="we")
             else:
-                # Para botón de espacio
+                # Ajustar botón ESPACIO
                 button.grid(row=row + 1, column=0, columnspan=8,
                             padx=2, pady=2, sticky="we")
 
